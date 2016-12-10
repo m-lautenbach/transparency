@@ -8,28 +8,20 @@
   <script src="/js/lodash.min.js"></script>
   <script>
     var socket = io('/master')
-    Rx.Observable
+    var list = Rx.Observable
         .fromEvent(socket, 'client list')
-        .subscribe(
-            function(clientList) {
-                console.log('Clients:\n', _.filter(clientList, {self: true}))
-            }
-        )
-    Rx.Observable
+    var connections = Rx.Observable
         .fromEvent(socket, 'client connected')
-        .subscribe(
-            function(clientDetails) {
-                console.log('Client connected: ', clientDetails)
-            }
-        )
-    Rx.Observable
+    var disconnections = Rx.Observable
         .fromEvent(socket, 'client disconnected')
+
+    Rx.Observable
+        .merge(list, connections, disconnections)
         .subscribe(
-            function(clientDetails) {
-                console.log('Client disconnected: ', clientDetails)
+            function(event) {
+                console.log(event)
             }
         )
-
   </script>
   <body>
   </body>
