@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+  <head>
+    <title>transparency master</title>
+  </head>
+  <script src="/js/socket.io.min.js"></script>
+  <script src="/js/rx.all.min.js"></script>
+  <script src="/js/lodash.min.js"></script>
+  <script>
+    var socket = io('/master')
+    Rx.Observable
+        .fromEvent(socket, 'client list')
+        .subscribe(
+            function(clientList) {
+                console.log('Clients:\n', _.filter(clientList, {self: true}))
+            }
+        )
+    Rx.Observable
+        .fromEvent(socket, 'client connected')
+        .subscribe(
+            function(clientDetails) {
+                console.log('Client connected: ', clientDetails)
+            }
+        )
+    Rx.Observable
+        .fromEvent(socket, 'client disconnected')
+        .subscribe(
+            function(clientDetails) {
+                console.log('Client disconnected: ', clientDetails)
+            }
+        )
+
+  </script>
+  <body>
+  </body>
+</html>

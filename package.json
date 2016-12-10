@@ -1,0 +1,11 @@
+{
+  "name": "transparancy",
+  "version": "0.0.1",
+  "description": "fully transparant web framework",
+  "dependencies": {
+    "express": "^4.10.2",
+    "lodash": "^4.17.2",
+    "rxjs": "^5.0.0-rc.5",
+    "socket.io": "^1.7.1"
+  }
+}
