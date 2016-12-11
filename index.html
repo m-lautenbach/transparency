@@ -4,9 +4,22 @@
     <title>transparency client</title>
   </head>
   <script src="/js/socket.io.min.js"></script>
-  <script>
-    var socket = io();
-  </script>
+  <script src="/js/bowser.min.js"></script>
+  <script src="/js/lodash.min.js"></script>
   <body>
   </body>
+  <script>
+    var socket = io();
+    var userDetails = {
+      browser: {
+        name: bowser.name,
+        version: bowser.version,
+        capabilites: _.find(['a', 'c', 'x'], (flag) => bowser[flag]),
+      },
+      os: _.find(['mac', 'windows', 'windowsphone', 'linux', 'chromeos', 'android', 'ios', 'blackberry', 'firefoxos', 'webos', 'bada', 'tizen', 'sailfish'],
+        (flag) => bowser[flag]
+      ),
+    }
+    console.log(userDetails)
+  </script>
 </html>
