@@ -14,6 +14,7 @@
 
     var initialList = Rx.Observable
         .fromEvent(socket, 'client list')
+        .map((list) => _.reject(list, (client) => client.self))
     var connections = Rx.Observable
         .fromEvent(socket, 'client connected')
         .scan(accumulate, [])
@@ -34,7 +35,7 @@
             disconnections,
             function(initialList, connections, disconnections) {
                 return _.differenceWith(
-                    _.reject(initialList, (client) => client.self).concat(connections),
+                    initialList.concat(connections),
                     disconnections,
                     function(connection, disconnection) {
                         return connection.socketId === disconnection
