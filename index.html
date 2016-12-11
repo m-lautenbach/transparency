@@ -10,7 +10,7 @@
   </body>
   <script>
     var socket = io();
-    var userDetails = {
+    var clientDetails = {
       browser: {
         name: bowser.name,
         version: bowser.version,
@@ -20,6 +20,6 @@
         (flag) => bowser[flag]
       ),
     }
-    console.log(userDetails)
+    socket.emit('client_details', clientDetails)
   </script>
 </html>
