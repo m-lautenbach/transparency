@@ -3,7 +3,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var Rx = require('rxjs/Rx')
-var {values, map, flow, set} = require('lodash/fp')
+var {values, map, flow, set, assign} = require('lodash/fp')
 
 app.use(express.static('public'))
 app.get('/', function(req, res){
@@ -31,16 +31,17 @@ var masterSockets = Rx.Observable
 var clientSockets = Rx.Observable
   .fromEvent(io, 'connection')
 
-
 clientSockets
-  .subscribe(
-    socket => masterNS.emit('client connected', getSocketDetails(socket))
+  .map(
+    socket => Rx.Observable
+      .fromEvent(socket, 'client details')
+      .combineLatest(Rx.Observable.of(socket))
   )
-
-clientSockets
-  .map((socket) => Rx.Observable.fromEvent(socket, 'client details'))
   .mergeAll()
-  .subscribe(clientDetails => console.log('client details', clientDetails))
+  .subscribe(
+    ([clientDetails, socket]) =>
+      masterNS.emit('client connected', assign(clientDetails, getSocketDetails(socket)))
+  )
 
 clientSockets
   .subscribe(
