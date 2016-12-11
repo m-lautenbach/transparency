@@ -28,10 +28,10 @@ masterNS = io.of('/master')
 var masterSockets = Rx.Observable
   .fromEvent(masterNS, 'connection')
 
-var clientSockets = Rx.Observable
+var connections = Rx.Observable
   .fromEvent(io, 'connection')
 
-clientSockets
+connections
   .map(
     socket => Rx.Observable
       .fromEvent(socket, 'client details')
@@ -47,7 +47,7 @@ clientSockets
       masterNS.emit('client connected', client)
   )
 
-clientSockets
+connections
   .map(
     socket => Rx.Observable
       .fromEvent(socket, 'disconnect')
