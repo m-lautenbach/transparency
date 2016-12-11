@@ -25,13 +25,13 @@
         .fromEvent(socket, 'client connected')
         .scan(accumulate, [])
         .merge(
-            Rx.Observable.return([])
+            Rx.Observable.of([])
         )
     var disconnections = Rx.Observable
         .fromEvent(socket, 'client disconnected')
         .scan(accumulate, [])
         .merge(
-            Rx.Observable.return([])
+            Rx.Observable.of([])
         )
 
     function render(clients) {
