@@ -17,9 +17,15 @@
     var connections = Rx.Observable
         .fromEvent(socket, 'client connected')
         .scan(accumulate, [])
+        .merge(
+            Rx.Observable.from([[]])
+        )
     var disconnections = Rx.Observable
         .fromEvent(socket, 'client disconnected')
         .scan(accumulate, [])
+        .merge(
+            Rx.Observable.from([[]])
+        )
 
     Rx.Observable
         .combineLatest(
