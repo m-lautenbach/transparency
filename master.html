@@ -63,7 +63,7 @@
                             getIcon(client.browser.name)
                         ),
                         vD.h('td', {className: 'client-row__browser-version'}, client.browser.version),
-                        vD.h('td', {className: 'client-row__os'}, client.os),
+                        vD.h('td', {className: 'client-row__os'}, getIcon(client.os)),
                         vD.h('td', {className: 'client-row__capabilities'}, client.capabilities),
                     ])
                 )
