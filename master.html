@@ -41,9 +41,14 @@
             ].concat(
                 _.map(
                     clients,
-                    client => vD.h('tr', {className: 'client-list__entry client-row'}, [
-                        vD.h('td', {className: 'client-row__socket-id'}, client.socketId),
-                        vD.h('td', {className: 'client-row__address'}, client.address),
+                    client =>
+                        vD.h('tr', {className: 'client-list__entry client-row'}, [
+                            vD.h('td', {className: 'client-row__socket-id'}, client.socketId),
+                            vD.h('td', {className: 'client-row__address'}, client.address),
+                        vD.h('td', {className: 'client-row__browser-name'}, client.browser.name),
+                        vD.h('td', {className: 'client-row__browser-version'}, client.browser.version),
+                        vD.h('td', {className: 'client-row__os'}, client.os),
+                        vD.h('td', {className: 'client-row__capabilities'}, client.capabilities),
                     ])
                 )
             )
