@@ -53,7 +53,7 @@ Rx.Observable
         .fromEvent(socket, 'disconnect')
         .subscribe(
           function() {
-            masterNS.emit('client disconnected', getSocketDetails(socket))
+            masterNS.emit('client disconnected', socket.id)
           }
         )
     }
