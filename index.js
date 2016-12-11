@@ -50,6 +50,11 @@ Rx.Observable
     function(socket) {
       masterNS.emit('client connected', getSocketDetails(socket))
       Rx.Observable
+        .fromEvent(socket, 'client details')
+        .subscribe(
+          (clientDetails) => console.log('client details', clientDetails)
+        )
+      Rx.Observable
         .fromEvent(socket, 'disconnect')
         .subscribe(
           function() {
