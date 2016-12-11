@@ -39,10 +39,7 @@ Rx.Observable
             }
           },
           getConnectedClients(io.sockets.connected)
-        )
-      )
-    }
-  )
+))})
 
 Rx.Observable
   .fromEvent(io, 'connection')
@@ -59,10 +56,7 @@ Rx.Observable
         .subscribe(
           function() {
             masterNS.emit('client disconnected', socket.id)
-          }
-        )
-    }
-  )
+})})
 
 http.listen(3000, function(){
   console.log('listening on *:3000');
