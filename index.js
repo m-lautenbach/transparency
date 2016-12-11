@@ -3,7 +3,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var Rx = require('rxjs/Rx')
-var {values, map, flow, set, assign, omit} = require('lodash/fp')
+var {values, map, flow, set, assign, omit, differenceWith} = require('lodash/fp')
 
 app.use(express.static('public'))
 app.get('/', function(req, res){
@@ -72,6 +72,18 @@ var allDisconnections = disconnections
   .merge(
       Rx.Observable.of([])
   )
+
+var connectedClients = Rx.Observable
+    .combineLatest(
+        allConnections,
+        allDisconnections,
+        (connections, disconnections) =>
+            differenceWith(
+                (client, [msg, socket]) => client.socketId === socket.id,
+                connections,
+                disconnections
+            )
+    )
 
 clients
   .map(client => omit('socket', client))
