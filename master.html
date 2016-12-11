@@ -34,13 +34,17 @@
         )
 
     function render(clients) {
-        return vD.h('table',
-            _.map(
-                clients,
-                (client) => vD.h('tr', [
-                    vD.h('td', client.socketId),
-                    vD.h('td', client.address)
-                ])
+        return vD.h('table', {className: 'client-list'},
+            [
+                vD.h('caption', {className: 'client-list__header'}, 'connected clients')
+            ].concat(
+                _.map(
+                    clients,
+                    (client) => vD.h('tr', {className: 'client-list__entry client-row'}, [
+                        vD.h('td', {className: 'client-row__socket-id'}, client.socketId),
+                        vD.h('td', {className: 'client-row__address'}, client.address)
+                    ])
+                )
             )
         )
     }
