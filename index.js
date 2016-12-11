@@ -31,6 +31,11 @@ var masterSockets = Rx.Observable
 var clientSockets = Rx.Observable
   .fromEvent(io, 'connection')
 
+clientSockets
+  .map((socket) => Rx.Observable.fromEvent(socket, 'client details'))
+  .mergeAll()
+  .subscribe((clientDetails) => console.log('client details', clientDetails))
+
 masterSockets
   .subscribe(
     function(masterSocket) {
@@ -50,11 +55,6 @@ clientSockets
   .subscribe(
     function(socket) {
       masterNS.emit('client connected', getSocketDetails(socket))
-      Rx.Observable
-        .fromEvent(socket, 'client details')
-        .subscribe(
-          (clientDetails) => console.log('client details', clientDetails)
-        )
       Rx.Observable
         .fromEvent(socket, 'disconnect')
         .subscribe(
