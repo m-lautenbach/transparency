@@ -23,6 +23,10 @@ getConnectedClients = flow(
   map(getSocketDetails)
 )
 
+function accumulate(list, item) {
+    return list.concat([item])
+}
+
 masterNS = io.of('/master')
 
 var masterSockets = Rx.Observable
@@ -55,6 +59,18 @@ var clients = connections
         getSocketDetails(socket),
         {socket: socket}
       )
+  )
+
+var allConnections = clients
+  .scan(accumulate, [])
+  .merge(
+      Rx.Observable.of([])
+  )
+
+var allDisconnections = disconnections
+  .scan(accumulate, [])
+  .merge(
+      Rx.Observable.of([])
   )
 
 clients
