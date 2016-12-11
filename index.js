@@ -38,9 +38,13 @@ clientSockets
       .combineLatest(Rx.Observable.of(socket))
   )
   .mergeAll()
-  .subscribe(
+  .map(
     ([clientDetails, socket]) =>
-      masterNS.emit('client connected', assign(clientDetails, getSocketDetails(socket)))
+      assign(clientDetails, getSocketDetails(socket))
+  )
+  .subscribe(
+    client =>
+      masterNS.emit('client connected', client)
   )
 
 clientSockets
