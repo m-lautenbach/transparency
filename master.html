@@ -11,7 +11,8 @@
         return list.concat([item])
     }
     var socket = io('/master')
-    var list = Rx.Observable
+
+    var initialList = Rx.Observable
         .fromEvent(socket, 'client list')
     var connections = Rx.Observable
         .fromEvent(socket, 'client connected')
