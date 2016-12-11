@@ -27,7 +27,7 @@
             connections,
             disconnections,
             function(initialList, connections, disconnections) {
-                _.differenceBy(
+                return _.differenceWith(
                     _.reject(initialList, (client) => client.self).concat(connections),
                     disconnections,
                     function(connection, disconnection) {
