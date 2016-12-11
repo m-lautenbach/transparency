@@ -31,17 +31,21 @@ var masterSockets = Rx.Observable
 var connections = Rx.Observable
   .fromEvent(io, 'connection')
 
-connections
+var clientDetails = connections
   .map(
     socket => Rx.Observable
       .fromEvent(socket, 'client details')
-      .combineLatest(Rx.Observable.of(socket))
+      .combineLatest(
+        Rx.Observable.of(socket)
+      )
   )
   .mergeAll()
   .map(
     ([clientDetails, socket]) =>
       assign(clientDetails, getSocketDetails(socket))
   )
+
+clientDetails
   .subscribe(
     client =>
       masterNS.emit('client connected', client)
