@@ -6,7 +6,12 @@
   <script src="/js/socket.io.min.js"></script>
   <script src="/js/rx.all.min.js"></script>
   <script src="/js/lodash.min.js"></script>
+  <script src="/js/virtual-dom.min.js"></script>
+  <body>
+  </body>
   <script>
+    var vD = virtualDom
+
     var accumulate = function(list, item) {
         return list.concat([item])
     }
@@ -28,6 +33,22 @@
             Rx.Observable.from([[]])
         )
 
+    function render(clients) {
+        return vD.h('table',
+            _.map(
+                clients,
+                (client) => vD.h('tr', [
+                    vD.h('td', client.socketId),
+                    vD.h('td', client.address)
+                ])
+            )
+        )
+    }
+
+    var currentListVDOM = render([])
+    var rootNode = vD.create(currentListVDOM)
+    document.body.appendChild(rootNode)
+
     Rx.Observable
         .combineLatest(
             initialList,
@@ -45,12 +66,11 @@
         )
         .subscribe(
             function(connectedClients) {
-                console.log('connectedClients: ', connectedClients)
+                var newListVDOM = render(connectedClients)
+                var patches = vD.diff(currentListVDOM, newListVDOM)
+                rootNode = vD.patch(rootNode, patches)
+                currentListVDOM = newListVDOM
             }
         )
-
-
   </script>
-  <body>
-  </body>
 </html>
