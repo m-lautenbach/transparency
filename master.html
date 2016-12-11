@@ -21,6 +21,27 @@
         .fromEvent(socket, 'client disconnected')
         .scan(accumulate, [])
 
+    Rx.Observable
+        .combineLatest(
+            initialList,
+            connections,
+            disconnections,
+            function(initialList, connections, disconnections) {
+                _.differenceBy(
+                    _.reject(initialList, (client) => client.self).concat(connections),
+                    disconnections,
+                    function(connection, disconnection) {
+                        return connection.socketId === disconnection
+                    }
+                )
+            }
+        )
+        .subscribe(
+            function(connectedClients) {
+                console.log('connectedClients: ', connectedClients)
+            }
+        )
+
 
   </script>
   <body>
