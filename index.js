@@ -25,8 +25,13 @@ getConnectedClients = flow(
 
 masterNS = io.of('/master')
 
-Rx.Observable
+var masterSockets = Rx.Observable
   .fromEvent(masterNS, 'connection')
+
+var clientSockets = Rx.Observable
+  .fromEvent(io, 'connection')
+
+masterSockets
   .subscribe(
     function(masterSocket) {
       masterSocket.emit('client list',
@@ -41,8 +46,7 @@ Rx.Observable
           getConnectedClients(io.sockets.connected)
 ))})
 
-Rx.Observable
-  .fromEvent(io, 'connection')
+clientSockets
   .subscribe(
     function(socket) {
       masterNS.emit('client connected', getSocketDetails(socket))
