@@ -7,6 +7,9 @@
   <script src="/js/rx.all.min.js"></script>
   <script src="/js/lodash.min.js"></script>
   <script>
+    var accumulate = function(list, item) {
+        return list.concat([item])
+    }
     var socket = io('/master')
     var list = Rx.Observable
         .fromEvent(socket, 'client list')
@@ -15,11 +18,19 @@
     var disconnections = Rx.Observable
         .fromEvent(socket, 'client disconnected')
 
-    Rx.Observable
-        .merge(list, connections, disconnections)
+    connections
+        .scan(accumulate, [])
         .subscribe(
-            function(event) {
-                console.log(event)
+            function(clients) {
+                console.log('connections: ', clients)
+            }
+        )
+
+    disconnections
+        .scan(accumulate, [])
+        .subscribe(
+            function(clients) {
+                console.log('disconnections: ', clients)
             }
         )
   </script>
