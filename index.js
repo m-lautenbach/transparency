@@ -31,7 +31,7 @@ var masterSockets = Rx.Observable
 var connections = Rx.Observable
   .fromEvent(io, 'connection')
 
-var disconnects = connections
+var disconnections = connections
   .map(
     socket => Rx.Observable
       .fromEvent(socket, 'disconnect')
@@ -64,7 +64,7 @@ clients
       masterNS.emit('client connected', client)
   )
 
-disconnects
+disconnections
   .subscribe(
     ([msg, socket]) => masterNS.emit('client disconnected', socket.id)
   )
