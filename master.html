@@ -15,24 +15,12 @@
         .fromEvent(socket, 'client list')
     var connections = Rx.Observable
         .fromEvent(socket, 'client connected')
+        .scan(accumulate, [])
     var disconnections = Rx.Observable
         .fromEvent(socket, 'client disconnected')
-
-    connections
         .scan(accumulate, [])
-        .subscribe(
-            function(clients) {
-                console.log('connections: ', clients)
-            }
-        )
 
-    disconnections
-        .scan(accumulate, [])
-        .subscribe(
-            function(clients) {
-                console.log('disconnections: ', clients)
-            }
-        )
+
   </script>
   <body>
   </body>
