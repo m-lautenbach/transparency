@@ -20,7 +20,7 @@
 
     var initialList = Rx.Observable
         .fromEvent(socket, 'client list')
-        .map((list) => _.reject(list, (client) => client.self))
+        .map(list => _.reject(list, (client) => client.self))
     var connections = Rx.Observable
         .fromEvent(socket, 'client connected')
         .scan(accumulate, [])
@@ -41,7 +41,7 @@
             ].concat(
                 _.map(
                     clients,
-                    (client) => vD.h('tr', {className: 'client-list__entry client-row'}, [
+                    client => vD.h('tr', {className: 'client-list__entry client-row'}, [
                         vD.h('td', {className: 'client-row__socket-id'}, client.socketId),
                         vD.h('td', {className: 'client-row__address'}, client.address)
                     ])
