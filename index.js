@@ -44,10 +44,14 @@ clientSockets
   )
 
 clientSockets
-  .subscribe(
+  .map(
     socket => Rx.Observable
       .fromEvent(socket, 'disconnect')
-      .subscribe(() => masterNS.emit('client disconnected', socket.id))
+      .combineLatest(Rx.Observable.of(socket))
+  )
+  .mergeAll()
+  .subscribe(
+    ([msg, socket]) => masterNS.emit('client disconnected', socket.id)
   )
 
 masterSockets
