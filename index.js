@@ -31,7 +31,7 @@ var masterSockets = Rx.Observable
 var connections = Rx.Observable
   .fromEvent(io, 'connection')
 
-var clientDetails = connections
+var clients = connections
   .map(
     socket => Rx.Observable
       .fromEvent(socket, 'client details')
@@ -49,7 +49,7 @@ var clientDetails = connections
       )
   )
 
-clientDetails
+clients
   .map(client => omit('socket', client))
   .subscribe(
     client =>
