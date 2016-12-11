@@ -31,10 +31,23 @@ var masterSockets = Rx.Observable
 var clientSockets = Rx.Observable
   .fromEvent(io, 'connection')
 
+
+clientSockets
+  .subscribe(
+    socket => masterNS.emit('client connected', getSocketDetails(socket))
+  )
+
 clientSockets
   .map((socket) => Rx.Observable.fromEvent(socket, 'client details'))
   .mergeAll()
-  .subscribe((clientDetails) => console.log('client details', clientDetails))
+  .subscribe(clientDetails => console.log('client details', clientDetails))
+
+clientSockets
+  .subscribe(
+    socket => Rx.Observable
+      .fromEvent(socket, 'disconnect')
+      .subscribe(() => masterNS.emit('client disconnected', socket.id))
+  )
 
 masterSockets
   .subscribe(
@@ -50,17 +63,6 @@ masterSockets
           },
           getConnectedClients(io.sockets.connected)
 ))})
-
-clientSockets
-  .subscribe(
-    function(socket) {
-      masterNS.emit('client connected', getSocketDetails(socket))
-      Rx.Observable
-        .fromEvent(socket, 'disconnect')
-        .subscribe(
-          function() {
-            masterNS.emit('client disconnected', socket.id)
-})})
 
 http.listen(3000, function(){
   console.log('listening on *:3000');
