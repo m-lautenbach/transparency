@@ -3,7 +3,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var Rx = require('rxjs/Rx')
-var {values, map, flow, set, assign} = require('lodash/fp')
+var {values, map, flow, set, assign, omit} = require('lodash/fp')
 
 app.use(express.static('public'))
 app.get('/', function(req, res){
@@ -42,10 +42,15 @@ var clientDetails = connections
   .mergeAll()
   .map(
     ([clientDetails, socket]) =>
-      assign(clientDetails, getSocketDetails(socket))
+      assign(
+        clientDetails,
+        getSocketDetails(socket),
+        {socket: socket}
+      )
   )
 
 clientDetails
+  .map(client => omit('socket', client))
   .subscribe(
     client =>
       masterNS.emit('client connected', client)
