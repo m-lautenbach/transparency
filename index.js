@@ -85,6 +85,16 @@ var connectedClients = Rx.Observable
             )
     )
 
+masterSockets
+  .withLatestFrom(connectedClients)
+  .subscribe(
+    function([masterSocket, connectedClients]) {
+      masterSocket.emit('client list',
+        map(
+          (client) => omit('socket', client),
+          connectedClients
+))})
+
 clients
   .map(client => omit('socket', client))
   .subscribe(
@@ -96,21 +106,6 @@ disconnections
   .subscribe(
     ([msg, socket]) => masterNS.emit('client disconnected', socket.id)
   )
-
-masterSockets
-  .subscribe(
-    function(masterSocket) {
-      masterSocket.emit('client list',
-        map(
-          function(client) {
-            if(client.socketId === masterSocket.id.split('#')[1]) {
-              return set('self', true, client)
-            } else {
-              return client
-            }
-          },
-          getConnectedClients(io.sockets.connected)
-))})
 
 http.listen(3000, function(){
   console.log('listening on *:3000');
