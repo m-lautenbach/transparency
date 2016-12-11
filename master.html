@@ -13,7 +13,7 @@
   <script>
     var vD = virtualDom
 
-    var accumulate = function(list, item) {
+    function accumulate(list, item) {
         return list.concat([item])
     }
     var socket = io('/master')

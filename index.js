@@ -14,7 +14,7 @@ app.get('/master', function(req, res){
   res.sendFile(__dirname + '/master.html');
 });
 
-getSocketDetails = function(socket) {
+function getSocketDetails(socket) {
   return {socketId:socket.id, address:socket.handshake.address}
 }
 
