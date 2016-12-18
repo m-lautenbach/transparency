@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "rollup": "^0.37.0",
+    "rollup-plugin-node-resolve": "^2.0.0",
     "rollup-watch": "^2.5.0"
   }
 }
