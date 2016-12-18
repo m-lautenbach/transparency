@@ -1,25 +1,16 @@
 <!doctype html>
 <html>
   <head>
-    <title>transparency client</title>
+    <title>transparency</title>
   </head>
-  <script src="/js/socket.io.min.js"></script>
+  <link rel="stylesheet" href="/css/master.css">
+  <link rel="stylesheet" href="/css/font-awesome.min.css">
   <script src="/js/bowser.min.js"></script>
+  <script src="/js/socket.io.min.js"></script>
+  <script src="/js/rx.all.min.js"></script>
   <script src="/js/lodash.min.js"></script>
+  <script src="/js/virtual-dom.min.js"></script>
   <body>
   </body>
-  <script>
-    var socket = io();
-    var clientDetails = {
-      browser: {
-        name: bowser.name,
-        version: bowser.version,
-        capabilities: _.find(['a', 'c', 'x'], (flag) => bowser[flag]),
-      },
-      os: _.find(['mac', 'windows', 'windowsphone', 'linux', 'chromeos', 'android', 'ios', 'blackberry', 'firefoxos', 'webos', 'bada', 'tizen', 'sailfish'],
-        (flag) => bowser[flag]
-      ),
-    }
-    socket.emit('client details', clientDetails)
-  </script>
+  <script src="/js/index.js"></script>
 </html>

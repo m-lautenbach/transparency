@@ -6,12 +6,8 @@ var Rx = require('rxjs/Rx')
 var {values, map, flow, set, assign, omit, differenceWith} = require('lodash/fp')
 
 app.use(express.static('public'))
-app.get('/', function(req, res){
+app.get('/*', function(req, res){
   res.sendFile(__dirname + '/index.html');
-});
-
-app.get('/master', function(req, res){
-  res.sendFile(__dirname + '/master.html');
 });
 
 function getSocketDetails(socket) {
