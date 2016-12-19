@@ -2,3 +2,4 @@
 transparency.sublime-project
 transparency.sublime-workspace
 index.js
+*.js.map
