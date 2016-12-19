@@ -3,10 +3,13 @@
   "version": "0.0.1",
   "description": "fully transparant web framework",
   "dependencies": {
+    "bowser": "^1.6.0",
     "express": "^4.10.2",
     "lodash": "^4.17.2",
     "rxjs": "^5.0.0-rc.5",
-    "socket.io": "^1.7.1"
+    "socket.io": "^1.7.1",
+    "socket.io-client": "^1.7.2",
+    "virtual-dom": "^2.1.1"
   },
   "devDependencies": {
     "babel": "^6.5.2",
