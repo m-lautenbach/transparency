@@ -25,7 +25,7 @@ fs.readdirSync('node_modules')
 
 module.exports = [
     {
-        entry: './lib/client.js',
+        entry: './src/client.js',
         devtool: 'source-map',
         output: {
             path: path.join(__dirname, 'public', 'js'),
@@ -36,7 +36,7 @@ module.exports = [
 ,
     {
         context: __dirname,
-        entry: './lib/server.js',
+        entry: './src/server.js',
         target: 'node',
         node: {
             __filename: false,
