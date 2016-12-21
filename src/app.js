@@ -19,12 +19,11 @@ function app(ioServer) {
     .fromEvent(ioServer, 'connection')
 
   var disconnections = connections
-    .map(
+    .flatMap(
       socket => Rx.Observable
         .fromEvent(socket, 'disconnect')
         .combineLatest(Rx.Observable.of(socket))
     )
-    .mergeAll()
 
   var clients = connections
     .map(
