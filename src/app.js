@@ -30,9 +30,7 @@ function app(ioServer) {
     .map(
       socket => Rx.Observable
         .fromEvent(socket, 'client details')
-        .combineLatest(
-          Rx.Observable.of(socket)
-        )
+        .combineLatest(Rx.Observable.of(socket))
     )
     .mergeAll()
     .map(
