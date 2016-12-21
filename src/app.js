@@ -26,12 +26,11 @@ function app(ioServer) {
     )
 
   var clients = connections
-    .map(
+    .flatMap(
       socket => Rx.Observable
         .fromEvent(socket, 'client details')
         .combineLatest(Rx.Observable.of(socket))
     )
-    .mergeAll()
     .map(
       ([clientDetails, socket]) =>
         assign(
