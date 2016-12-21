@@ -45,16 +45,12 @@ function app(ioServer) {
     )
 
   var allConnections = clients
-    .scan(accumulate, [])
-    .merge(
-        Rx.Observable.of([])
-    )
+    .startWith([])
+    .scan(accumulate)
 
   var allDisconnections = disconnections
-    .scan(accumulate, [])
-    .merge(
-        Rx.Observable.of([])
-    )
+    .startWith([])
+    .scan(accumulate)
 
   var connectedClients = Rx.Observable
       .combineLatest(

@@ -18,17 +18,13 @@ if(window.location.pathname === '/master') {
 
   var connections = Rx.Observable
     .fromEvent(socket, 'client connected')
-    .scan(accumulate, [])
-    .merge(
-      Rx.Observable.of([])
-    )
+    .startWith([])
+    .scan(accumulate)
 
   var disconnections = Rx.Observable
     .fromEvent(socket, 'client disconnected')
-    .scan(accumulate, [])
-    .merge(
-      Rx.Observable.of([])
-    )
+    .startWith([])
+    .scan(accumulate)
 
   var currentListVDOM = render([])
   var rootNode = create(currentListVDOM)
