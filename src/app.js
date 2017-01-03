@@ -1,6 +1,6 @@
 import Rx from 'rxjs'
 import {values, map, flow, set, assign, omit, differenceWith} from 'lodash/fp'
-import {fromEvent, of} from './fpRx/observable'
+import {fromEvent, of, combineLatest} from './fpRx/observable'
 
 function getSocketDetails(socket) {
   return {socketId:socket.id, address:socket.handshake.address}
@@ -45,17 +45,20 @@ function app(ioServer) {
     .startWith([])
     .scan(accumulate)
 
-  var connectedClients = Rx.Observable
-      .combineLatest(
-          allConnections,
-          allDisconnections,
-          (connections, disconnections) =>
-              differenceWith(
-                  (client, [msg, socket]) => client.socketId === socket.id,
-                  connections,
-                  disconnections
-              )
-      )
+  var connectedClients =
+    combineLatest(
+      (connections, disconnections) =>
+          differenceWith(
+              (client, [msg, socket]) => client.socketId === socket.id,
+              connections,
+              disconnections
+          )
+    ,
+      [
+        allConnections,
+        allDisconnections,
+      ]
+    )
 
   masterSockets
     .withLatestFrom(connectedClients)
