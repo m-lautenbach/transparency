@@ -82,24 +82,31 @@ function getIcon(tag) {
 }
 
 function render(clients) {
-  return h('table', {className: 'client-list'},
-    [
-      h('caption', {className: 'client-list__header'}, 'connected clients')
-    ].concat(
-      map(
-        clients,
-        client =>
-          h('tr', {className: 'client-list__entry client-row'}, [
-            h('td', {className: 'client-row__socket-id'}, client.socketId),
-            h('td', {className: 'client-row__address'}, client.address),
-          h('td', {className: 'client-row__os-icon'}, getIcon(client.os)),
-          h('td',
-            {className: 'client-row__browser-icon'},
-            getIcon(client.browser.name)
-          ),
-          h('td', {className: 'client-row__browser-version'}, client.browser.version),
-          h('td', {className: 'client-row__capabilities'}, client.browser.capabilities)
-        ])
+  return h('div', {className: 'row'},
+    h('div', {className: 'col-md-4'},
+      h('div', {className: 'panel panel-default'},
+        h('div', {className: 'panel-body'},
+          h('table', {className: 'client-list table table-striped table-hover table-condensed'},
+            [
+              h('caption', {className: 'client-list__header'}, 'connected clients'),
+              h('tbody', {}, map(
+                clients,
+                client =>
+                  h('tr', {className: 'client-list__entry client-row'}, [
+                    h('td', {className: 'client-row__socket-id'}, client.socketId),
+                    h('td', {className: 'client-row__address'}, client.address),
+                    h('td', {className: 'client-row__os-icon'}, getIcon(client.os)),
+                    h('td',
+                      {className: 'client-row__browser-icon'},
+                      getIcon(client.browser.name)
+                    ),
+                    h('td', {className: 'client-row__browser-version'}, client.browser.version),
+                    h('td', {className: 'client-row__capabilities'}, client.browser.capabilities),
+                  ])
+              ))
+            ]
+          )
+        )
       )
     )
   )
