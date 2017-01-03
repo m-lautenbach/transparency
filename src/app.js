@@ -1,5 +1,6 @@
 import Rx from 'rxjs'
 import {values, map, flow, set, assign, omit, differenceWith} from 'lodash/fp'
+import {fromEvent} from './fpRx/observable'
 
 function getSocketDetails(socket) {
   return {socketId:socket.id, address:socket.handshake.address}
@@ -12,23 +13,19 @@ function accumulate(list, item) {
 function app(ioServer) {
   var masterNS = ioServer.of('/master')
 
-  var masterSockets = Rx.Observable
-    .fromEvent(masterNS, 'connection')
+  var masterSockets = fromEvent('connection', masterNS)
 
-  var connections = Rx.Observable
-    .fromEvent(ioServer, 'connection')
+  var connections = fromEvent('connection', ioServer)
 
   var disconnections = connections
     .flatMap(
-      socket => Rx.Observable
-        .fromEvent(socket, 'disconnect')
+      socket => fromEvent('disconnect', socket)
         .combineLatest(Rx.Observable.of(socket))
     )
 
   var clients = connections
     .flatMap(
-      socket => Rx.Observable
-        .fromEvent(socket, 'client details')
+      socket => fromEvent('client details', socket)
         .combineLatest(Rx.Observable.of(socket))
     )
     .map(
