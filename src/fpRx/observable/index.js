@@ -12,7 +12,7 @@ const of = Observable.of
 const fromEvent = bindTwo(Observable.fromEvent)
 const combineLatest = curry(
   (selector, observableSource, observableTarget) =>
-    Observable.combineLatest([observableTarget, observableSource], selector)
+    Observable.combineLatest(observableTarget, observableSource, selector)
 )
 
 export {
