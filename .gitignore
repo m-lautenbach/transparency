@@ -1,5 +1,6 @@
 /node_modules
 transparency.sublime-project
 transparency.sublime-workspace
-index.js
 *.js.map
+/index.js
+/public/js
