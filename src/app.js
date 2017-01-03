@@ -54,10 +54,8 @@ function app(ioServer) {
               disconnections
           )
     ,
-      [
-        allConnections,
-        allDisconnections,
-      ]
+      allConnections,
+      allDisconnections,
     )
 
   masterSockets
