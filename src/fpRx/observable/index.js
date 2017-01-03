@@ -8,6 +8,9 @@ const fromEvent =
     curry,
   )(Observable.fromEvent)
 
+const of = Observable.of
+
 export {
   fromEvent,
+  of,
 }

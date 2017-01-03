@@ -1,6 +1,6 @@
 import Rx from 'rxjs'
 import {values, map, flow, set, assign, omit, differenceWith} from 'lodash/fp'
-import {fromEvent} from './fpRx/observable'
+import {fromEvent, of} from './fpRx/observable'
 
 function getSocketDetails(socket) {
   return {socketId:socket.id, address:socket.handshake.address}
@@ -20,13 +20,13 @@ function app(ioServer) {
   var disconnections = connections
     .flatMap(
       socket => fromEvent('disconnect', socket)
-        .combineLatest(Rx.Observable.of(socket))
+        .combineLatest(of(socket))
     )
 
   var clients = connections
     .flatMap(
       socket => fromEvent('client details', socket)
-        .combineLatest(Rx.Observable.of(socket))
+        .combineLatest(of(socket))
     )
     .map(
       ([clientDetails, socket]) =>
