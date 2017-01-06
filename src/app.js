@@ -11,6 +11,7 @@ import {
 } from 'lodash/fp'
 import {
   combineLatest,
+  flatMap,
   fromEvent,
   map as rxMap,
   of,
@@ -35,22 +36,21 @@ function app(ioServer) {
 
   var connections = fromEvent('connection', ioServer)
 
-  var disconnections = connections
-    .flatMap(
-      socket => flow(
-        fromEvent('disconnect'),
-        combineLatest(concat, of(socket)),
-      )(socket)
-    )
+  var disconnections = flow(
+    flatMap(socket => flow(
+      fromEvent('disconnect'),
+      combineLatest(concat, of(socket)),
+    )(socket))
+  )(connections)
 
-  var clients = connections
-    .flatMap(
+  var clients = flow(
+    flatMap(
       socket => flow(
         fromEvent('client details'),
         combineLatest(concat, of(socket)),
       )(socket)
-    )
-    .map(
+    ),
+    rxMap(
       ([clientDetails, socket]) =>
         assign(
           clientDetails,
@@ -58,6 +58,7 @@ function app(ioServer) {
           {socket: socket}
         )
     )
+  )(connections)
 
   var allConnections = flow(
     startWith([]),
