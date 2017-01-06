@@ -31,10 +31,11 @@ if(window.location.pathname === '/master') {
     scan(accumulate),
   )(socket)
 
-  var disconnections = Rx.Observable
-    .fromEvent(socket, 'client disconnected')
-    .startWith([])
-    .scan(accumulate)
+  var disconnections = flow(
+    fromEvent('client disconnected'),
+    startWith([]),
+    scan(accumulate),
+  )(socket)
 
   var currentListVDOM = render([])
   var rootNode = create(currentListVDOM)

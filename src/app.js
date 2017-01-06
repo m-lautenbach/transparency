@@ -9,7 +9,13 @@ import {
   tap,
   values,
 } from 'lodash/fp'
-import {fromEvent, of, combineLatest} from './fpRx/observable'
+import {
+  combineLatest,
+  fromEvent,
+  of,
+  scan,
+  startWith,
+} from './fpRx/observable'
 
 function getSocketDetails(socket) {
   return {socketId:socket.id, address:socket.handshake.address}
@@ -50,13 +56,15 @@ function app(ioServer) {
         )
     )
 
-  var allConnections = clients
-    .startWith([])
-    .scan(accumulate)
+  var allConnections = flow(
+    startWith([]),
+    scan(accumulate),
+  )(clients)
 
-  var allDisconnections = disconnections
-    .startWith([])
-    .scan(accumulate)
+  var allDisconnections = flow(
+    startWith([]),
+    scan(accumulate),
+  )(disconnections)
 
   var connectedClients =
     combineLatest(
