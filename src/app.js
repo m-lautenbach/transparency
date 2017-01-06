@@ -1,4 +1,3 @@
-import Rx from 'rxjs'
 import {
   assign,
   concat,
