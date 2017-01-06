@@ -29,8 +29,10 @@ function app(ioServer) {
 
   var disconnections = connections
     .flatMap(
-      socket => fromEvent('disconnect', socket)
-        .combineLatest(of(socket))
+      socket => flow(
+        fromEvent('disconnect'),
+        combineLatest(concat, of(socket))
+      )(socket)
     )
 
   var clients = connections
