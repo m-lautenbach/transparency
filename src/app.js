@@ -68,17 +68,16 @@ function app(ioServer) {
     scan(accumulate),
   )(disconnections)
 
-  var connectedClients =
-    combineLatest(
-      (connections, disconnections) =>
-        differenceWith(
-            (client, [msg, socket]) => client.socketId === socket.id,
-            connections,
-            disconnections
-        ),
-      allDisconnections,
-      allConnections,
-    )
+  var connectedClients = combineLatest(
+    (connections, disconnections) =>
+      differenceWith(
+          (client, [msg, socket]) => client.socketId === socket.id,
+          connections,
+          disconnections
+      ),
+    allDisconnections,
+    allConnections,
+  )
 
   flow(
     withLatestFrom(connectedClients),
