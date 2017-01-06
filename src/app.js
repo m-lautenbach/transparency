@@ -85,7 +85,7 @@ function app(ioServer) {
       ([masterSocket, connectedClients]) =>
         masterSocket.emit('client list',
           map(
-            (client) => omit('socket', client),
+            omit('socket'),
             connectedClients,
           )
         )
@@ -93,7 +93,7 @@ function app(ioServer) {
   )(masterSockets)
 
   clients
-    .map(client => omit('socket', client))
+    .map(omit('socket'))
     .subscribe(
       client =>
         masterNS.emit('client connected', client)
