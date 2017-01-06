@@ -1,8 +1,8 @@
 import {
-  reject,
   differenceWith,
-  map,
   find,
+  map,
+  reject,
 } from 'lodash'
 import Rx from 'rxjs'
 import io from 'socket.io-client'
