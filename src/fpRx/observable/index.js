@@ -19,6 +19,7 @@ const bindMethodTwo = curry((methodName, arg2, arg1, object) =>
 
 const combineLatest = bindThree(Observable.combineLatest)
 const fromEvent = bindTwo(Observable.fromEvent)
+const map = bindMethodOne('map')
 const of = Observable.of
 const scan = bindMethodOne('scan')
 const startWith = bindMethodOne('startWith')
@@ -28,6 +29,7 @@ const withLatestFrom = bindMethodOne('withLatestFrom')
 export {
   combineLatest,
   fromEvent,
+  map,
   of,
   scan,
   startWith,

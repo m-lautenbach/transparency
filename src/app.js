@@ -12,6 +12,7 @@ import {
 import {
   combineLatest,
   fromEvent,
+  map as rxMap,
   of,
   scan,
   startWith,
@@ -92,17 +93,17 @@ function app(ioServer) {
     )
   )(masterSockets)
 
-  clients
-    .map(omit('socket'))
-    .subscribe(
-      client =>
-        masterNS.emit('client connected', client)
+  flow(
+    rxMap(omit('socket')),
+    subscribe(
+      client => masterNS.emit('client connected', client)
     )
+  )(clients)
 
-  disconnections
-    .subscribe(
-      ([msg, socket]) => masterNS.emit('client disconnected', socket.id)
-    )
+  subscribe(
+    ([msg, socket]) => masterNS.emit('client disconnected', socket.id),
+    disconnections
+  )
 }
 
 export default app
