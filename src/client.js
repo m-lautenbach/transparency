@@ -50,7 +50,7 @@ if(window.location.pathname === '/master') {
         differenceWith(
           initialList.concat(connections),
           disconnections,
-          (connection, disconnection) => connection.socketId === disconnection
+          (connection, disconnection) => connection.id === disconnection
         )
     )
     .subscribe(
@@ -104,7 +104,7 @@ function render(clients) {
                 clients,
                 client =>
                   h('tr', {className: 'client-list__entry client-row'}, [
-                    h('td', {className: 'client-row__socket-id'}, client.socketId),
+                    h('td', {className: 'client-row__socket-id'}, client.id),
                     h('td', {className: 'client-row__address'}, client.address),
                     h('td', {className: 'client-row__os-icon'}, getIcon(client.os)),
                     h('td',

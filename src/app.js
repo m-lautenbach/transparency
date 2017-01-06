@@ -22,7 +22,7 @@ import {
 } from './fpRx/observable'
 
 function getSocketDetails(socket) {
-  return {socketId:socket.id, address:socket.handshake.address}
+  return {id:socket.id, address:socket.handshake.address}
 }
 
 function accumulate(list, item) {
@@ -73,7 +73,7 @@ function app(ioServer) {
   var connectedClients = combineLatest(
     (connections, disconnections) =>
       differenceWith(
-          (client, [msg, socket]) => client.socketId === socket.id,
+          (client, [msg, socket]) => client.id === socket.id,
           connections,
           disconnections
       ),
