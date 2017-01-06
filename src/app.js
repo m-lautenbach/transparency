@@ -15,6 +15,8 @@ import {
   of,
   scan,
   startWith,
+  subscribe,
+  withLatestFrom,
 } from './fpRx/observable'
 
 function getSocketDetails(socket) {
@@ -78,15 +80,18 @@ function app(ioServer) {
       allConnections,
     )
 
-  masterSockets
-    .withLatestFrom(connectedClients)
-    .subscribe(
-      function([masterSocket, connectedClients]) {
+  flow(
+    withLatestFrom(connectedClients),
+    subscribe(
+      ([masterSocket, connectedClients]) =>
         masterSocket.emit('client list',
           map(
             (client) => omit('socket', client),
-            connectedClients
-  ))})
+            connectedClients,
+          )
+        )
+    )
+  )(masterSockets)
 
   clients
     .map(client => omit('socket', client))

@@ -22,7 +22,8 @@ const fromEvent = bindTwo(Observable.fromEvent)
 const of = Observable.of
 const scan = bindMethodOne('scan')
 const startWith = bindMethodOne('startWith')
-const withLatestFrom = bindMethodTwo('withLatestFrom')
+const subscribe = bindMethodOne('subscribe')
+const withLatestFrom = bindMethodOne('withLatestFrom')
 
 export {
   combineLatest,
@@ -30,5 +31,6 @@ export {
   of,
   scan,
   startWith,
+  subscribe,
   withLatestFrom,
 }
