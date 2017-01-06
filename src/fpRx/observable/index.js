@@ -27,6 +27,11 @@ const startWith = bindMethodOne('startWith')
 const subscribe = bindMethodOne('subscribe')
 const withLatestFrom = bindMethodOne('withLatestFrom')
 
+const toList = flow(
+  startWith([]),
+  scan((list, item) => list.concat([item])),
+)
+
 export {
   combineLatest,
   flatMap,
@@ -36,5 +41,6 @@ export {
   scan,
   startWith,
   subscribe,
+  toList,
   withLatestFrom,
 }

@@ -18,6 +18,7 @@ import {
   scan,
   startWith,
   subscribe,
+  toList,
   withLatestFrom,
 } from './fpRx/observable'
 
@@ -55,11 +56,6 @@ function app(ioServer) {
         )
     )
   )(connections)
-
-  const toList = flow(
-    startWith([]),
-    scan((list, item) => list.concat([item])),
-  )
 
   var allConnections = toList(clients)
   var allDisconnections = toList(disconnections)

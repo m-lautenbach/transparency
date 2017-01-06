@@ -15,6 +15,7 @@ import {
   of,
   scan,
   startWith,
+  toList,
 } from './fpRx/observable'
 
 if(window.location.pathname === '/master') {
@@ -27,14 +28,12 @@ if(window.location.pathname === '/master') {
 
   var connections = flow(
     fromEvent('client connected'),
-    startWith([]),
-    scan(accumulate),
+    toList,
   )(socket)
 
   var disconnections = flow(
     fromEvent('client disconnected'),
-    startWith([]),
-    scan(accumulate),
+    toList,
   )(socket)
 
   var currentListVDOM = render([])
@@ -74,10 +73,6 @@ if(window.location.pathname === '/master') {
     ),
   }
   socket.emit('client details', clientDetails)
-}
-
-function accumulate(list, item) {
-  return list.concat([item])
 }
 
 function getIcon(tag) {
