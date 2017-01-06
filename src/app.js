@@ -25,10 +25,6 @@ function getSocketDetails(socket) {
   return {id:socket.id, address:socket.handshake.address}
 }
 
-function accumulate(list, item) {
-    return list.concat([item])
-}
-
 function app(ioServer) {
   var masterNS = ioServer.of('/master')
 
@@ -60,15 +56,13 @@ function app(ioServer) {
     )
   )(connections)
 
-  var allConnections = flow(
+  const toList = flow(
     startWith([]),
-    scan(accumulate),
-  )(clients)
+    scan((list, item) => list.concat([item])),
+  )
 
-  var allDisconnections = flow(
-    startWith([]),
-    scan(accumulate),
-  )(disconnections)
+  var allConnections = toList(clients)
+  var allDisconnections = toList(disconnections)
 
   var connectedClients = combineLatest(
     (connections, disconnections) =>
