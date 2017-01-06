@@ -1,6 +1,7 @@
 import {
   differenceWith,
   find,
+  flow,
   map,
   reject,
 } from 'lodash'
@@ -8,18 +9,27 @@ import Rx from 'rxjs'
 import io from 'socket.io-client'
 import {create, diff, patch, h} from 'virtual-dom'
 import bowser from 'bowser'
+import {
+  combineLatest,
+  fromEvent,
+  of,
+  scan,
+  startWith,
+} from './fpRx/observable'
 
 if(window.location.pathname === '/master') {
   var socket = io('/master')
 
-  var initialList = Rx.Observable
-    .fromEvent(socket, 'client list')
-    .map(list => reject(list, (client) => client.self))
+  var initialList = flow(
+    fromEvent('client list'),
+    map(list => reject(list, (client) => client.self)),
+  )(socket)
 
-  var connections = Rx.Observable
-    .fromEvent(socket, 'client connected')
-    .startWith([])
-    .scan(accumulate)
+  var connections = flow(
+    fromEvent('client connected'),
+    startWith([]),
+    scan(accumulate),
+  )(socket)
 
   var disconnections = Rx.Observable
     .fromEvent(socket, 'client disconnected')
