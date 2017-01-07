@@ -36,7 +36,7 @@ if(window.location.pathname === '/master') {
     toList,
   )(socket)
 
-  var currentListVDOM = render([])
+  var currentListVDOM = renderMaster([])
   var rootNode = create(currentListVDOM)
   document.body.appendChild(rootNode)
 
@@ -53,12 +53,7 @@ if(window.location.pathname === '/master') {
         )
     )
     .subscribe(
-      function(connectedClients) {
-        var newListVDOM = render(connectedClients)
-        var patches = diff(currentListVDOM, newListVDOM)
-        rootNode = patch(rootNode, patches)
-        currentListVDOM = newListVDOM
-      }
+      (connectedClients) => updateDOM(renderMaster(connectedClients))
     )
 } else {
   var socket = io();
@@ -87,7 +82,13 @@ function getIcon(tag) {
   return h('i', {className: `fa fa-${iconName}`})
 }
 
-function render(clients) {
+function updateDOM(newVDOM) {
+  var patches = diff(currentListVDOM, newVDOM)
+  rootNode = patch(rootNode, patches)
+  currentListVDOM = newVDOM
+}
+
+function renderMaster(clients) {
   return h('div', {className: 'row'},
     h('div', {className: 'col-md-4'},
       h('div', {className: 'panel panel-default'},
