@@ -1,7 +1,6 @@
 import {create, diff, patch, h} from 'virtual-dom'
 
 function init(initalVDOM) {
-
   var currentVDOM = initalVDOM
   var rootNode = create(currentVDOM)
   document.body.appendChild(rootNode)
