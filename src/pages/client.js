@@ -12,10 +12,10 @@ import {
   merge,
   subscribe,
 } from '../fpRx/observable'
-import {render} from '../sinks'
+import {updateDOM} from '../sinks'
 
 function handler() {
-  const updateDOM = render(renderVDOM('DISCONNECTED'))
+  updateDOM(renderVDOM('DISCONNECTED'))
 
   var socket = io();
   var clientDetails = {

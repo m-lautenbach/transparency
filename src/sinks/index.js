@@ -1,3 +1,3 @@
-import render from './render'
+import updateDOM from './updateDOM'
 
-export {render}
+export {updateDOM}

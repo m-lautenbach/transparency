@@ -14,7 +14,7 @@ import {
   toCurrentList,
   toList,
 } from '../fpRx/observable'
-import {render} from '../sinks'
+import {updateDOM} from '../sinks'
 
 function handler() {
   var socket = io('/master')
@@ -34,7 +34,7 @@ function handler() {
     toList,
   )(socket)
 
-  const updateDOM = render(renderVDOM([]))
+  updateDOM(renderVDOM([]))
 
   return subscribe(
     flow(
