@@ -15,7 +15,7 @@ import {
 import {updateDOM} from '../sinks'
 
 function handler() {
-  updateDOM(renderVDOM('DISCONNECTED'))
+  updateDOM(renderVDOM('connecting'))
 
   var socket = io();
   var clientDetails = {

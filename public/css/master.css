@@ -16,3 +16,7 @@ body {
 .connection-state.disconnected {
     color: red;
 }
+
+.connection-state.connecting {
+    color: grey;
+}
