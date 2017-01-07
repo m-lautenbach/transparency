@@ -1,9 +1,18 @@
 import masterHandler from './pages/master'
 import clientHandler from './pages/client'
 
-if(window.location.pathname === '/master') {
-  masterHandler()
-} else {
-  clientHandler()
+var subscriber = handleUrl(window.location.pathname)
+
+window.navTo = function(url) {
+  subscriber.unsubscribe()
+  subscriber = handleUrl(url)
 }
 
+function handleUrl(url) {
+  switch(url) {
+    case '/master':
+      return masterHandler()
+    default:
+      return clientHandler()
+  }
+}
