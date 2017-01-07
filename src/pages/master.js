@@ -35,7 +35,10 @@ function handler() {
   const updateDOM = render(renderVDOM([]))
 
   subscribe(
-    (connectedClients) => updateDOM(renderVDOM(connectedClients)),
+    flow(
+      renderVDOM,
+      updateDOM,
+    ),
     toCurrentList('id', initialList, connections, disconnections),
   )
 }
