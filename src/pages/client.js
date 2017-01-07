@@ -17,7 +17,7 @@ import {updateDOM} from '../sinks'
 function handler() {
   updateDOM(renderVDOM('connecting'))
 
-  var socket = io();
+  var socket = io({'forceNew':true});
   var clientDetails = {
     browser: {
       name: bowser.name,
@@ -49,7 +49,16 @@ function handler() {
 }
 
 function renderVDOM(connectionState) {
-  return h('i', {className: `fa fa-circle connection-state ${connectionState}`})
+  return h('div',
+    [
+      h('ul', {className: 'nav nav-tabs'}, [
+          h('li', h('a', {href: "javascript:navTo('/master');"}, 'Master')),
+          h('li', {className: 'active'}, h('a', {href: "javascript:;"}, 'Client')),
+        ]
+      ),
+      h('i', {className: `fa fa-circle connection-state ${connectionState}`}),
+    ]
+  )
 }
 
 export default handler

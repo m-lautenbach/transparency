@@ -17,7 +17,7 @@ import {
 import {updateDOM} from '../sinks'
 
 function handler() {
-  var socket = io('/master')
+  var socket = io('/master', {'forceNew':true })
 
   var initialList = flow(
     fromEvent('client list'),
@@ -46,33 +46,42 @@ function handler() {
 }
 
 function renderVDOM(clients) {
-  return h('div', {className: 'row'},
-    h('div', {className: 'col-md-4'},
-      h('div', {className: 'panel panel-default'},
-        h('div', {className: 'panel-body'},
-          h('table', {className: 'client-list table table-striped table-hover table-condensed'},
-            [
-              h('caption', {className: 'client-list__header'}, 'connected clients'),
-              h('tbody', {}, map(
-                client =>
-                  h('tr', {className: 'client-list__entry client-row'}, [
-                    h('td', {className: 'client-row__socket-id'}, client.id),
-                    h('td', {className: 'client-row__address'}, client.address),
-                    h('td', {className: 'client-row__os-icon'}, getIcon(client.os)),
-                    h('td',
-                      {className: 'client-row__browser-icon'},
-                      getIcon(client.browser.name)
-                    ),
-                    h('td', {className: 'client-row__browser-version'}, client.browser.version),
-                    h('td', {className: 'client-row__capabilities'}, client.browser.capabilities),
-                  ]),
-                clients,
-              ))
-            ]
+  return h('div',
+    [
+      h('ul', {className: 'nav nav-tabs'}, [
+          h('li', {className: 'active'}, h('a', {href: "javascript:;"}, 'Master')),
+          h('li', h('a', {href: "javascript:navTo('/client');"}, 'Client')),
+        ]
+      ),
+      h('div', {className: 'row'},
+        h('div', {className: 'col-md-4'},
+          h('div', {className: 'panel panel-default'},
+            h('div', {className: 'panel-body'},
+              h('table', {className: 'client-list table table-striped table-hover table-condensed'},
+                [
+                  h('caption', {className: 'client-list__header'}, 'connected clients'),
+                  h('tbody', {}, map(
+                    client =>
+                      h('tr', {className: 'client-list__entry client-row'}, [
+                        h('td', {className: 'client-row__socket-id'}, client.id),
+                        h('td', {className: 'client-row__address'}, client.address),
+                        h('td', {className: 'client-row__os-icon'}, getIcon(client.os)),
+                        h('td',
+                          {className: 'client-row__browser-icon'},
+                          getIcon(client.browser.name)
+                        ),
+                        h('td', {className: 'client-row__browser-version'}, client.browser.version),
+                        h('td', {className: 'client-row__capabilities'}, client.browser.capabilities),
+                      ]),
+                    clients,
+                  ))
+                ]
+              )
+            )
           )
         )
       )
-    )
+    ]
   )
 }
 
