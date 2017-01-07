@@ -4,7 +4,7 @@ import {
   reject,
 } from 'lodash'
 import io from 'socket.io-client'
-import {create, h} from 'virtual-dom'
+import {h} from 'virtual-dom'
 
 import {
   fromEvent,
