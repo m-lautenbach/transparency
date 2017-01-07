@@ -1,13 +1,17 @@
 import {
-  flow,
   map,
-  reject,
 } from 'lodash'
+import {
+  flow,
+  reject,
+  get,
+} from 'lodash/fp'
 import io from 'socket.io-client'
 import {h} from 'virtual-dom'
 
 import {
   fromEvent,
+  map as rxMap,
   subscribe,
   toCurrentList,
   toList,
@@ -19,7 +23,7 @@ function handler() {
 
   var initialList = flow(
     fromEvent('client list'),
-    map(list => reject(list, (client) => client.self)),
+    rxMap(reject(get('self'))),
   )(socket)
 
   var connections = flow(
