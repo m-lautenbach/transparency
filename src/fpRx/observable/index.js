@@ -21,6 +21,7 @@ const combineLatest = bindThree(Observable.combineLatest)
 const flatMap = bindMethodOne('flatMap')
 const fromEvent = bindTwo(Observable.fromEvent)
 const map = bindMethodOne('map')
+const merge = observables => Observable.merge(...observables)
 const of = Observable.of
 const scan = bindMethodOne('scan')
 const startWith = bindMethodOne('startWith')
@@ -37,6 +38,7 @@ export {
   flatMap,
   fromEvent,
   map,
+  merge,
   of,
   scan,
   startWith,

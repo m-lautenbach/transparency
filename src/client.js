@@ -13,9 +13,11 @@ import {
   combineLatest,
   fromEvent,
   map as rxMap,
+  merge,
   of,
   scan,
   startWith,
+  subscribe,
   toList,
 } from './fpRx/observable'
 
@@ -82,11 +84,13 @@ if(window.location.pathname === '/master') {
     fromEvent('disconnect'),
     rxMap(() => 'disconnected'),
   )(socket)
-  Rx.Observable.merge(
-    connects,
-    disconnects,
-  ).subscribe(
-    (connectionState) => updateDOM(renderClient(connectionState))
+
+  subscribe(
+    (connectionState) => updateDOM(renderClient(connectionState)),
+    merge([
+      connects,
+      disconnects,
+    ]),
   )
 }
 
