@@ -1,5 +1,4 @@
 import {
-  differenceWith,
   find,
   flow,
   map,
@@ -18,6 +17,7 @@ import {
   scan,
   startWith,
   subscribe,
+  toCurrentList,
   toList,
 } from './fpRx/observable'
 
@@ -43,23 +43,10 @@ if(window.location.pathname === '/master') {
   var rootNode = create(currentListVDOM)
   document.body.appendChild(rootNode)
 
-  flow(
-    combineLatest(
-      (initialList, connections, disconnections) =>
-        differenceWith(
-          initialList.concat(connections),
-          disconnections,
-          (connection, disconnection) => connection.id === disconnection
-        )
-    ),
-    subscribe(
-      (connectedClients) => updateDOM(renderMaster(connectedClients))
-    )
-  )([
-    initialList,
-    connections,
-    disconnections,
-  ])
+  subscribe(
+    (connectedClients) => updateDOM(renderMaster(connectedClients)),
+    toCurrentList('id', initialList, connections, disconnections),
+  )
 
 } else {
   var currentListVDOM = renderClient('DISCONNECTED')

@@ -1,5 +1,12 @@
 import {Observable} from 'rxjs'
-import {bind, curry, ary, flip, flow} from 'lodash/fp'
+import {
+  ary,
+  bind,
+  curry,
+  differenceWith,
+  flip,
+  flow,
+} from 'lodash/fp'
 
 const bindTwo = curry((f, arg2, arg1) =>
   f(arg1, arg2)
@@ -33,6 +40,23 @@ const toList = flow(
   scan((list, item) => list.concat([item])),
 )
 
+const toCurrentList = curry(
+  (idKey, initialListObservable, addObservable, removeObservable) =>
+    combineLatest(
+      (initial, adds, removes) =>
+        differenceWith(
+          (item, idToRemove) => item[idKey] === idToRemove,
+          initial.concat(adds),
+          removes,
+        ),
+      [
+        initialListObservable,
+        addObservable,
+        removeObservable,
+      ]
+    )
+  )
+
 export {
   combineLatest,
   flatMap,
@@ -43,6 +67,7 @@ export {
   scan,
   startWith,
   subscribe,
+  toCurrentList,
   toList,
   withLatestFrom,
 }
