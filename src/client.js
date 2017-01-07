@@ -12,6 +12,7 @@ import bowser from 'bowser'
 import {
   combineLatest,
   fromEvent,
+  map as rxMap,
   of,
   scan,
   startWith,
@@ -56,6 +57,10 @@ if(window.location.pathname === '/master') {
       (connectedClients) => updateDOM(renderMaster(connectedClients))
     )
 } else {
+  var currentListVDOM = renderClient('DISCONNECTED')
+  var rootNode = create(currentListVDOM)
+  document.body.appendChild(rootNode)
+
   var socket = io();
   var clientDetails = {
     browser: {
@@ -68,6 +73,21 @@ if(window.location.pathname === '/master') {
     ),
   }
   socket.emit('client details', clientDetails)
+
+  var connects = flow(
+    fromEvent('connect'),
+    rxMap(() => 'connected'),
+  )(socket)
+  var disconnects = flow(
+    fromEvent('disconnect'),
+    rxMap(() => 'disconnected'),
+  )(socket)
+  Rx.Observable.merge(
+    connects,
+    disconnects,
+  ).subscribe(
+    (connectionState) => updateDOM(renderClient(connectionState))
+  )
 }
 
 function getIcon(tag) {
@@ -86,6 +106,10 @@ function updateDOM(newVDOM) {
   var patches = diff(currentListVDOM, newVDOM)
   rootNode = patch(rootNode, patches)
   currentListVDOM = newVDOM
+}
+
+function renderClient(connectionState) {
+  return h('i', {className: `fa fa-circle connection-state ${connectionState}`})
 }
 
 function renderMaster(clients) {

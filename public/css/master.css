@@ -1,0 +1,14 @@
+.connection-state {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    text-shadow: 0 0 4px #333;
+}
+
+.connection-state.connected {
+    color: #5cb85c;
+}
+
+.connection-state.disconnected {
+    color: red;
+}
