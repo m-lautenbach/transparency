@@ -1,8 +1,6 @@
 import {
-  map,
-} from 'lodash'
-import {
   flow,
+  map,
   reject,
   get,
 } from 'lodash/fp'
@@ -56,7 +54,6 @@ function renderVDOM(clients) {
             [
               h('caption', {className: 'client-list__header'}, 'connected clients'),
               h('tbody', {}, map(
-                clients,
                 client =>
                   h('tr', {className: 'client-list__entry client-row'}, [
                     h('td', {className: 'client-row__socket-id'}, client.id),
@@ -68,7 +65,8 @@ function renderVDOM(clients) {
                     ),
                     h('td', {className: 'client-row__browser-version'}, client.browser.version),
                     h('td', {className: 'client-row__capabilities'}, client.browser.capabilities),
-                  ])
+                  ]),
+                clients,
               ))
             ]
           )
