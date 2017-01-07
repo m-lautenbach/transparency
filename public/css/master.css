@@ -1,3 +1,7 @@
+body {
+    margin: 5px;
+}
+
 .connection-state {
     position: absolute;
     top: 5px;
