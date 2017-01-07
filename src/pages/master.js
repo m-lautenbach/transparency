@@ -36,7 +36,7 @@ function handler() {
 
   const updateDOM = render(renderVDOM([]))
 
-  subscribe(
+  return subscribe(
     flow(
       renderVDOM,
       updateDOM,

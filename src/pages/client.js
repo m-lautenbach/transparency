@@ -39,7 +39,7 @@ function handler() {
     rxMap(() => 'disconnected'),
   )(socket)
 
-  subscribe(
+  return subscribe(
     (connectionState) => updateDOM(renderVDOM(connectionState)),
     merge([
       connects,
