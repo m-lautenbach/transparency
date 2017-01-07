@@ -43,21 +43,24 @@ if(window.location.pathname === '/master') {
   var rootNode = create(currentListVDOM)
   document.body.appendChild(rootNode)
 
-  Rx.Observable
-    .combineLatest(
-      initialList,
-      connections,
-      disconnections,
+  flow(
+    combineLatest(
       (initialList, connections, disconnections) =>
         differenceWith(
           initialList.concat(connections),
           disconnections,
           (connection, disconnection) => connection.id === disconnection
         )
-    )
-    .subscribe(
+    ),
+    subscribe(
       (connectedClients) => updateDOM(renderMaster(connectedClients))
     )
+  )([
+    initialList,
+    connections,
+    disconnections,
+  ])
+
 } else {
   var currentListVDOM = renderClient('DISCONNECTED')
   var rootNode = create(currentListVDOM)

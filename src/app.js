@@ -36,7 +36,8 @@ function app(ioServer) {
   var disconnections = flow(
     flatMap(socket => flow(
       fromEvent('disconnect'),
-      combineLatest(concat, of(socket)),
+      concat(of(socket)),
+      combineLatest(concat),
     )(socket))
   )(connections)
 
@@ -44,11 +45,12 @@ function app(ioServer) {
     flatMap(
       socket => flow(
         fromEvent('client details'),
-        combineLatest(concat, of(socket)),
+        concat(of(socket)),
+        combineLatest(concat),
       )(socket)
     ),
     rxMap(
-      ([clientDetails, socket]) =>
+      ([socket, clientDetails]) =>
         assign(
           clientDetails,
           getSocketDetails(socket),
@@ -63,12 +65,14 @@ function app(ioServer) {
   var connectedClients = combineLatest(
     (connections, disconnections) =>
       differenceWith(
-          (client, [msg, socket]) => client.id === socket.id,
+          (client, [socket, msg]) => client.id === socket.id,
+          disconnections,
           connections,
-          disconnections
       ),
-    allDisconnections,
-    allConnections,
+    [
+      allDisconnections,
+      allConnections,
+    ]
   )
 
   flow(
@@ -92,7 +96,7 @@ function app(ioServer) {
   )(clients)
 
   subscribe(
-    ([msg, socket]) => masterNS.emit('client disconnected', socket.id),
+    ([socket, msg]) => masterNS.emit('client disconnected', socket.id),
     disconnections
   )
 }

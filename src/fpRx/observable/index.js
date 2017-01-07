@@ -17,7 +17,7 @@ const bindMethodTwo = curry((methodName, arg2, arg1, object) =>
   object[methodName](arg1, arg2)
 )
 
-const combineLatest = bindThree(Observable.combineLatest)
+const combineLatest = bindTwo(Observable.combineLatest)
 const flatMap = bindMethodOne('flatMap')
 const fromEvent = bindTwo(Observable.fromEvent)
 const map = bindMethodOne('map')
