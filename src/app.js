@@ -1,8 +1,8 @@
 import {
   assign,
   concat,
-  differenceWith,
   flow,
+  get,
   map,
   omit,
   set,
@@ -19,6 +19,7 @@ import {
   startWith,
   subscribe,
   toList,
+  toCurrentList,
   withLatestFrom,
 } from './fpRx/observable'
 
@@ -62,17 +63,11 @@ function app(ioServer) {
   var allConnections = toList(clients)
   var allDisconnections = toList(disconnections)
 
-  var connectedClients = combineLatest(
-    (connections, disconnections) =>
-      differenceWith(
-          (client, [socket, msg]) => client.id === socket.id,
-          disconnections,
-          connections,
-      ),
-    [
-      allDisconnections,
-      allConnections,
-    ]
+  var connectedClients = toCurrentList(
+    'id',
+    of([]),
+    allConnections,
+    rxMap(map(get('0.id')), allDisconnections),
   )
 
   flow(
