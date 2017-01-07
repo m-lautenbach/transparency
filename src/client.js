@@ -9,13 +9,9 @@ import io from 'socket.io-client'
 import {create, diff, patch, h} from 'virtual-dom'
 import bowser from 'bowser'
 import {
-  combineLatest,
   fromEvent,
   map as rxMap,
   merge,
-  of,
-  scan,
-  startWith,
   subscribe,
   toCurrentList,
   toList,

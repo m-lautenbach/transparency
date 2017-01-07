@@ -5,9 +5,6 @@ import {
   get,
   map,
   omit,
-  set,
-  tap,
-  values,
 } from 'lodash/fp'
 import {
   combineLatest,
@@ -15,8 +12,6 @@ import {
   fromEvent,
   map as rxMap,
   of,
-  scan,
-  startWith,
   subscribe,
   toList,
   toCurrentList,
