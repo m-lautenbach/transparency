@@ -1,73 +1,62 @@
-import {Observable} from 'rxjs'
+import { Observable } from 'rxjs';
 import {
-  ary,
-  bind,
-  curry,
-  differenceWith,
-  flip,
-  flow,
-} from 'lodash/fp'
+    curry,
+    differenceWith,
+    flow,
+} from 'lodash/fp';
 
 const bindTwo = curry((f, arg2, arg1) =>
-  f(arg1, arg2)
-)
-
-const bindThree = curry((f, arg3, arg2, arg1) =>
-  f(arg1, arg2, arg3)
-)
+    f(arg1, arg2),
+);
 
 const bindMethodOne = curry((methodName, arg, object) =>
-  object[methodName](arg)
-)
+    object[methodName](arg),
+);
 
-const bindMethodTwo = curry((methodName, arg2, arg1, object) =>
-  object[methodName](arg1, arg2)
-)
-
-const combineLatest = bindTwo(Observable.combineLatest)
-const flatMap = bindMethodOne('flatMap')
-const fromEvent = bindTwo(Observable.fromEvent)
-const map = bindMethodOne('map')
-const merge = observables => Observable.merge(...observables)
-const of = Observable.of
-const scan = bindMethodOne('scan')
-const startWith = bindMethodOne('startWith')
-const subscribe = bindMethodOne('subscribe')
-const withLatestFrom = bindMethodOne('withLatestFrom')
+const combineLatest = bindTwo(Observable.combineLatest);
+const flatMap = bindMethodOne('flatMap');
+const fromEvent = bindTwo(Observable.fromEvent);
+const map = bindMethodOne('map');
+const merge = observables => Observable.merge(...observables);
+const of = Observable.of;
+const scan = bindMethodOne('scan');
+const startWith = bindMethodOne('startWith');
+const subscribe = bindMethodOne('subscribe');
+const withLatestFrom = bindMethodOne('withLatestFrom');
 
 const toList = flow(
-  startWith([]),
-  scan((list, item) => list.concat([item])),
-)
+    startWith([]),
+    scan((list, item) => list.concat([item])),
+);
 
 const toCurrentList = curry(
-  (idKey, initialListObservable, addObservable, removeObservable) =>
-    combineLatest(
-      (initial, adds, removes) =>
-        differenceWith(
-          (item, idToRemove) => item[idKey] === idToRemove,
-          initial.concat(adds),
-          removes,
-        ),
-      [
-        initialListObservable,
-        addObservable,
-        removeObservable,
-      ]
-    )
-  )
+    (idKey, initialListObservable, addObservable, removeObservable) => combineLatest(
+        (initial, adds, removes) =>
+            differenceWith(
+                (item, idToRemove) => item[idKey] === idToRemove,
+                initial.concat(adds),
+                removes,
+            )
+        ,
+        [
+            initialListObservable,
+            addObservable,
+            removeObservable,
+        ],
+    ),
+);
 
 export {
-  combineLatest,
-  flatMap,
-  fromEvent,
-  map,
-  merge,
-  of,
-  scan,
-  startWith,
-  subscribe,
-  toCurrentList,
-  toList,
-  withLatestFrom,
-}
+    combineLatest,
+    flatMap,
+    fromEvent,
+    map,
+    merge,
+    of,
+    scan,
+    startWith,
+    subscribe,
+    toCurrentList,
+    toList,
+    withLatestFrom,
+};
