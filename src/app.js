@@ -19,25 +19,25 @@ import {
 } from './fpRx/observable'
 
 function getSocketDetails(socket) {
-  return {id:socket.id, address:socket.handshake.address}
+  return { id: socket.id, address: socket.handshake.address }
 }
 
 function app(ioServer) {
-  var masterNS = ioServer.of('/master')
-
-  var masterSockets = fromEvent('connection', masterNS)
-
-  var connections = fromEvent('connection', ioServer)
-
-  var disconnections = flow(
+  const masterNS = ioServer.of('/master');
+  
+  const masterSockets = fromEvent('connection', masterNS);
+  
+  const connections = fromEvent('connection', ioServer);
+  
+  const disconnections = flow(
     flatMap(socket => flow(
       fromEvent('disconnect'),
       concat(of(socket)),
       combineLatest(concat),
     )(socket))
-  )(connections)
-
-  var clients = flow(
+  )(connections);
+  
+  const clients = flow(
     flatMap(
       socket => flow(
         fromEvent('client details'),
@@ -50,21 +50,21 @@ function app(ioServer) {
         assign(
           clientDetails,
           getSocketDetails(socket),
-          {socket: socket}
+          { socket: socket }
         )
     )
-  )(connections)
-
-  var allConnections = toList(clients)
-  var allDisconnections = toList(disconnections)
-
-  var connectedClients = toCurrentList(
+  )(connections);
+  
+  const allConnections = toList(clients);
+  const allDisconnections = toList(disconnections);
+  
+  const connectedClients = toCurrentList(
     'id',
     of([]),
     allConnections,
     rxMap(map(get('0.id')), allDisconnections),
-  )
-
+  );
+  
   flow(
     withLatestFrom(connectedClients),
     subscribe(
@@ -77,14 +77,14 @@ function app(ioServer) {
         )
     )
   )(masterSockets)
-
+  
   flow(
     rxMap(omit('socket')),
     subscribe(
       client => masterNS.emit('client connected', client)
     )
   )(clients)
-
+  
   subscribe(
     ([socket, msg]) => masterNS.emit('client disconnected', socket.id),
     disconnections

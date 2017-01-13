@@ -3,7 +3,7 @@ import {
   flow,
 } from 'lodash'
 import io from 'socket.io-client'
-import {h} from 'virtual-dom'
+import { h } from 'virtual-dom'
 import bowser from 'bowser'
 
 import {
@@ -12,33 +12,47 @@ import {
   merge,
   subscribe,
 } from '../fpRx/observable'
-import {updateDOM} from '../sinks'
+import { updateDOM } from '../sinks'
 
 function handler() {
   updateDOM(renderVDOM('connecting'))
-
-  var socket = io({'forceNew':true});
-  var clientDetails = {
+  
+  const socket = io({ 'forceNew': true });
+  const clientDetails = {
     browser: {
       name: bowser.name,
       version: bowser.version,
       capabilities: find(['a', 'c', 'x'], (flag) => bowser[flag]),
     },
-    os: find(['mac', 'windows', 'windowsphone', 'linux', 'chromeos', 'android', 'ios', 'blackberry', 'firefoxos', 'webos', 'bada', 'tizen', 'sailfish'],
+    os: find([
+        'mac',
+        'windows',
+        'windowsphone',
+        'linux',
+        'chromeos',
+        'android',
+        'ios',
+        'blackberry',
+        'firefoxos',
+        'webos',
+        'bada',
+        'tizen',
+        'sailfish'
+      ],
       (flag) => bowser[flag]
     ),
-  }
+  };
   socket.emit('client details', clientDetails)
-
-  var connects = flow(
+  
+  const connects = flow(
     fromEvent('connect'),
     rxMap(() => 'connected'),
-  )(socket)
-  var disconnects = flow(
+  )(socket);
+  const disconnects = flow(
     fromEvent('disconnect'),
     rxMap(() => 'disconnected'),
-  )(socket)
-
+  )(socket);
+  
   return subscribe(
     (connectionState) => updateDOM(renderVDOM(connectionState)),
     merge([
@@ -51,12 +65,12 @@ function handler() {
 function renderVDOM(connectionState) {
   return h('div',
     [
-      h('ul', {className: 'nav nav-tabs'}, [
-          h('li', h('a', {href: "javascript:navTo('/master');"}, 'Master')),
-          h('li', {className: 'active'}, h('a', {href: "javascript:;"}, 'Client')),
+      h('ul', { className: 'nav nav-tabs' }, [
+          h('li', h('a', { href: "javascript:navTo('/master');" }, 'Master')),
+          h('li', { className: 'active' }, h('a', { href: "javascript:;" }, 'Client')),
         ]
       ),
-      h('i', {className: `fa fa-circle connection-state ${connectionState}`}),
+      h('i', { className: `fa fa-circle connection-state ${connectionState}` }),
     ]
   )
 }

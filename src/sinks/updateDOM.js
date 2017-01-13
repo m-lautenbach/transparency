@@ -1,11 +1,11 @@
-import {create, diff, patch, h} from 'virtual-dom'
+import { create, diff, patch, h } from 'virtual-dom'
 
-var currentVDOM = h('div')
-var rootNode = create(currentVDOM)
+let currentVDOM = h('div');
+let rootNode = create(currentVDOM);
 document.body.appendChild(rootNode)
 
 function updateDOM(newVDOM) {
-  var patches = diff(currentVDOM, newVDOM)
+  const patches = diff(currentVDOM, newVDOM);
   rootNode = patch(rootNode, patches)
   currentVDOM = newVDOM
 }

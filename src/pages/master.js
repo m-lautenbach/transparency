@@ -5,7 +5,7 @@ import {
   get,
 } from 'lodash/fp'
 import io from 'socket.io-client'
-import {h} from 'virtual-dom'
+import { h } from 'virtual-dom'
 
 import {
   fromEvent,
@@ -14,28 +14,28 @@ import {
   toCurrentList,
   toList,
 } from '../fpRx/observable'
-import {updateDOM} from '../sinks'
+import { updateDOM } from '../sinks'
 
 function handler() {
-  var socket = io('/master', {'forceNew':true })
-
-  var initialList = flow(
+  const socket = io('/master', { 'forceNew': true });
+  
+  const initialList = flow(
     fromEvent('client list'),
     rxMap(reject(get('self'))),
-  )(socket)
-
-  var connections = flow(
+  )(socket);
+  
+  const connections = flow(
     fromEvent('client connected'),
     toList,
-  )(socket)
-
-  var disconnections = flow(
+  )(socket);
+  
+  const disconnections = flow(
     fromEvent('client disconnected'),
     toList,
-  )(socket)
-
+  )(socket);
+  
   updateDOM(renderVDOM([]))
-
+  
   return subscribe(
     flow(
       renderVDOM,
@@ -48,30 +48,30 @@ function handler() {
 function renderVDOM(clients) {
   return h('div',
     [
-      h('ul', {className: 'nav nav-tabs'}, [
-          h('li', {className: 'active'}, h('a', {href: "javascript:;"}, 'Master')),
-          h('li', h('a', {href: "javascript:navTo('/client');"}, 'Client')),
+      h('ul', { className: 'nav nav-tabs' }, [
+          h('li', { className: 'active' }, h('a', { href: "javascript:;" }, 'Master')),
+          h('li', h('a', { href: "javascript:navTo('/client');" }, 'Client')),
         ]
       ),
-      h('div', {className: 'row'},
-        h('div', {className: 'col-md-4'},
-          h('div', {className: 'panel panel-default'},
-            h('div', {className: 'panel-body'},
-              h('table', {className: 'client-list table table-striped table-hover table-condensed'},
+      h('div', { className: 'row' },
+        h('div', { className: 'col-md-4' },
+          h('div', { className: 'panel panel-default' },
+            h('div', { className: 'panel-body' },
+              h('table', { className: 'client-list table table-striped table-hover table-condensed' },
                 [
-                  h('caption', {className: 'client-list__header'}, 'connected clients'),
+                  h('caption', { className: 'client-list__header' }, 'connected clients'),
                   h('tbody', {}, map(
                     client =>
-                      h('tr', {className: 'client-list__entry client-row'}, [
-                        h('td', {className: 'client-row__socket-id'}, client.id),
-                        h('td', {className: 'client-row__address'}, client.address),
-                        h('td', {className: 'client-row__os-icon'}, getIcon(client.os)),
+                      h('tr', { className: 'client-list__entry client-row' }, [
+                        h('td', { className: 'client-row__socket-id' }, client.id),
+                        h('td', { className: 'client-row__address' }, client.address),
+                        h('td', { className: 'client-row__os-icon' }, getIcon(client.os)),
                         h('td',
-                          {className: 'client-row__browser-icon'},
+                          { className: 'client-row__browser-icon' },
                           getIcon(client.browser.name)
                         ),
-                        h('td', {className: 'client-row__browser-version'}, client.browser.version),
-                        h('td', {className: 'client-row__capabilities'}, client.browser.capabilities),
+                        h('td', { className: 'client-row__browser-version' }, client.browser.version),
+                        h('td', { className: 'client-row__capabilities' }, client.browser.capabilities),
                       ]),
                     clients,
                   ))
@@ -86,7 +86,7 @@ function renderVDOM(clients) {
 }
 
 function getIcon(tag) {
-  var iconName = undefined
+  let iconName = undefined;
   switch (tag) {
     case 'mac':
       iconName = 'apple'
@@ -94,7 +94,7 @@ function getIcon(tag) {
     default:
       iconName = tag.toLowerCase()
   }
-  return h('i', {className: `fa fa-${iconName}`})
+  return h('i', { className: `fa fa-${iconName}` })
 }
 
 export default handler
