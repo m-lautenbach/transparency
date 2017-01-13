@@ -4,3 +4,5 @@ transparency.sublime-workspace
 *.js.map
 /index.js
 /public/js
+dist/
+rethinkdb_data/
