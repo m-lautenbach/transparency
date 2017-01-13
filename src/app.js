@@ -6,6 +6,8 @@ import {
   map,
   omit,
 } from 'lodash/fp'
+import r from 'rethinkdb'
+
 import {
   combineLatest,
   flatMap,
@@ -23,6 +25,16 @@ function getSocketDetails(socket) {
 }
 
 function app(ioServer) {
+  
+  let connection = null;
+  r.connect( {host: 'localhost', port: 28015}, function(err, conn) {
+    if (err) throw err;
+    r.db('transparency').tableCreate('clients').run(conn, function(err, result) {
+      if (err) throw err;
+      console.log(JSON.stringify(result, null, 2));
+    })
+  })
+  
   const masterNS = ioServer.of('/master');
   
   const masterSockets = fromEvent('connection', masterNS);
