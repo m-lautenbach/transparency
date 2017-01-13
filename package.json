@@ -6,6 +6,7 @@
     "bowser": "^1.6.0",
     "express": "^4.10.2",
     "lodash": "^4.17.2",
+    "rethinkdb": "^2.3.3",
     "rxjs": "^5.0.0-rc.5",
     "socket.io": "^1.7.1",
     "socket.io-client": "^1.7.2",
