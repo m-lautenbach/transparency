@@ -17,8 +17,6 @@ import { updateDOM } from '../sinks'
 import { combineLatest, map } from '../fpRx/observable/index'
 
 function handler() {
-  updateDOM(renderVDOM({type: 'socket', status: 'connecting'}))
-  
   const socket = io({ 'forceNew': true });
   const clientDetails = {
     browser: {
@@ -65,11 +63,15 @@ function handler() {
     fromEvent('keypress'),
     map(get('key')),
   )(document)
+    .startWith('')
     .scan(
-      (acc, key) => acc.concat(key)
+      (acc, key) => acc.concat(key),
+      '',
     )
 
-  const connectionState = merge([connects, disconnects])
+  const connectionState =
+    merge([connects, disconnects])
+      .startWith({type: 'socket', status: 'connecting'})
   
   return subscribe(
     ([connectionState, keypresses]) => updateDOM(renderVDOM(connectionState, keypresses)),
