@@ -13,16 +13,11 @@ import {
   combineLatest,
   flatMap,
   fromEvent,
-  map as rxMap,
   of,
-  subscribe,
-  toList,
-  toCurrentList,
-  withLatestFrom,
 } from './fpRx/observable'
 
 function getSocketDetails(socket) {
-  return { id: socket.id, address: socket.handshake.address }
+  return { socketId: socket.id, address: socket.handshake.address }
 }
 
 function app(ioServer) {
@@ -31,13 +26,24 @@ function app(ioServer) {
   r.connect({ host: 'localhost', port: 28015 }, function (err, conn) {
     if (err) throw err;
     
-    r.db('transparency').tableCreate('clients').run(conn, () => {
-      const masterNS = ioServer.of('/master');
-      
-      const masterSockets = fromEvent('connection', masterNS);
-      
+    r.db('transparency').tableCreate('events').run(conn, () => {
       const connections = fromEvent('connection', ioServer);
-      
+
+      connections.subscribe((socket) => {
+        r.db('transparency')
+          .table('events')
+          .insert(
+            merge(
+              getSocketDetails(socket),
+              {type: 'connected'},
+            )
+          )
+          .run(conn, (err, data) => {
+            if(err) throw err
+            if(data.errors > 0) throw data.first_error
+          })
+      })
+
       const disconnections = flow(
         flatMap(socket => flow(
           fromEvent('disconnect'),
@@ -45,86 +51,24 @@ function app(ioServer) {
           combineLatest(concat),
         )(socket))
       )(connections);
-      
-      const clients = flow(
-        flatMap(
-          socket => flow(
-            fromEvent('client details'),
-            concat(of(socket)),
-            combineLatest(concat),
-          )(socket)
-        ),
-        rxMap(
-          ([socket, clientDetails]) =>
-            assign(
-              clientDetails,
-              getSocketDetails(socket),
-              { socket: socket }
-            )
-        )
-      )(connections);
 
-      clients.subscribe((client) => {
+      disconnections.subscribe(([socket, msg]) => {
         r.db('transparency')
-          .table('clients')
+          .table('events')
           .insert(
             merge(
-              client,
-              {status: 'connected'}
+              getSocketDetails(socket),
+              {
+                type: 'disconnected',
+                msg,
+              },
             )
           )
-          .run(conn, (err) => {
+          .run(conn, (err, data) => {
             if(err) throw err
+            if(data.errors > 0) throw data.first_error
           })
       })
-      
-      disconnections.subscribe(([socket]) => {
-        r.db('transparency')
-          .table('clients')
-          .get(socket.id)
-          .update({
-            status: 'disconnected'
-          })
-          .run(conn, (err) => {
-            if(err) throw err
-          })
-      })
-      
-      const allConnections = toList(clients);
-      const allDisconnections = toList(disconnections);
-      
-      const connectedClients = toCurrentList(
-        'id',
-        of([]),
-        allConnections,
-        rxMap(map(get('0.id')), allDisconnections),
-      );
-      
-      flow(
-        withLatestFrom(connectedClients),
-        subscribe(
-          ([masterSocket, connectedClients]) =>
-            masterSocket.emit('client list',
-              map(
-                omit('socket'),
-                connectedClients,
-              )
-            )
-        )
-      )(masterSockets)
-      
-      flow(
-        rxMap(omit('socket')),
-        subscribe(
-          client => masterNS.emit('client connected', client)
-        )
-      )(clients)
-      
-      subscribe(
-        ([socket, msg]) => masterNS.emit('client disconnected', socket.id),
-        disconnections
-      )
-      
     })
   })
 }
