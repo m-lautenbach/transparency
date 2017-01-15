@@ -2,6 +2,7 @@ import {
   find,
   flow,
 } from 'lodash'
+import { concat, get } from 'lodash/fp'
 import io from 'socket.io-client'
 import { h } from 'virtual-dom'
 import bowser from 'bowser'
@@ -13,9 +14,10 @@ import {
   subscribe,
 } from '../fpRx/observable'
 import { updateDOM } from '../sinks'
+import { combineLatest, map } from '../fpRx/observable/index'
 
 function handler() {
-  updateDOM(renderVDOM('connecting'))
+  updateDOM(renderVDOM({type: 'socket', status: 'connecting'}))
   
   const socket = io({ 'forceNew': true });
   const clientDetails = {
@@ -46,23 +48,39 @@ function handler() {
   
   const connects = flow(
     fromEvent('connect'),
-    rxMap(() => 'connected'),
+    rxMap(() => { return {
+      type: 'socket',
+      status: 'connected',
+    }}),
   )(socket);
   const disconnects = flow(
     fromEvent('disconnect'),
-    rxMap(() => 'disconnected'),
+    rxMap(() => { return {
+      type: 'socket',
+      status: 'disconnected',
+    }}),
   )(socket);
+
+  const keypresses = flow(
+    fromEvent('keypress'),
+    map(get('key')),
+  )(document)
+    .scan(
+      (acc, key) => acc.concat(key)
+    )
+
+  const connectionState = merge([connects, disconnects])
   
   return subscribe(
-    (connectionState) => updateDOM(renderVDOM(connectionState)),
-    merge([
-      connects,
-      disconnects,
+    ([connectionState, keypresses]) => updateDOM(renderVDOM(connectionState, keypresses)),
+    combineLatest(concat, [
+      connectionState,
+      keypresses,
     ]),
   )
 }
 
-function renderVDOM(connectionState) {
+function renderVDOM(connectionState, keypresses) {
   return h('div',
     [
       h('ul', { className: 'nav nav-tabs' }, [
@@ -70,7 +88,8 @@ function renderVDOM(connectionState) {
           h('li', { className: 'active' }, h('a', { href: "javascript:;" }, 'Client')),
         ]
       ),
-      h('i', { className: `fa fa-circle connection-state ${connectionState}` }),
+      h('div', keypresses),
+      h('i', { className: `fa fa-circle connection-state ${connectionState.status}` }),
     ]
   )
 }
