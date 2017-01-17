@@ -7,14 +7,8 @@ import io from 'socket.io-client'
 import { h } from 'virtual-dom'
 import bowser from 'bowser'
 
-import {
-  fromEvent,
-  map as rxMap,
-  merge,
-  subscribe,
-} from '../fpRx/observable'
 import { updateDOM } from '../sinks'
-import { combineLatest, map } from '../fpRx/observable/index'
+import * as Rx from 'rxjs'
 
 function handler() {
   const socket = io({ 'forceNew': true });
@@ -44,42 +38,45 @@ function handler() {
   };
   socket.emit('client details', clientDetails)
   
-  const connects = flow(
-    fromEvent('connect'),
-    rxMap(() => { return {
+  const connects = Rx.Observable
+    .fromEvent(socket, 'connect')
+    .map(() => ({
       type: 'socket',
       status: 'connected',
-    }}),
-  )(socket);
-  const disconnects = flow(
-    fromEvent('disconnect'),
-    rxMap(() => { return {
+    }))
+
+  const disconnects = Rx.Observable
+    .fromEvent(socket, 'disconnect')
+    .map(() => ({
       type: 'socket',
       status: 'disconnected',
-    }}),
-  )(socket);
+    }))
 
-  const keypresses = flow(
-    fromEvent('keypress'),
-    map(get('key')),
-  )(document)
+  const keypresses = Rx.Observable
+    .fromEvent(document, 'keypress')
+    .map(get('key'))
     .startWith('')
     .scan(
-      (acc, key) => acc.concat(key),
+      concat,
       '',
     )
 
-  const connectionState =
-    merge([connects, disconnects])
-      .startWith({type: 'socket', status: 'connecting'})
+  Rx.Observable
+    .fromEvent(document, 'click')
+    .subscribe(event => console.log(event.target))
+
+  const connectionState = Rx.Observable
+    .merge(connects, disconnects)
+    .startWith({type: 'socket', status: 'connecting'})
   
-  return subscribe(
-    ([connectionState, keypresses]) => updateDOM(renderVDOM(connectionState, keypresses)),
-    combineLatest(concat, [
+  return Rx.Observable
+    .combineLatest(
       connectionState,
       keypresses,
-    ]),
-  )
+    )
+    .subscribe(
+      ([connectionState, keypresses]) => updateDOM(renderVDOM(connectionState, keypresses))
+    )
 }
 
 function renderVDOM(connectionState, keypresses) {

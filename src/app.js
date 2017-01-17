@@ -8,13 +8,7 @@ import {
   omit,
 } from 'lodash/fp'
 import r from 'rethinkdb'
-
-import {
-  combineLatest,
-  flatMap,
-  fromEvent,
-  of,
-} from './fpRx/observable'
+import * as Rx from 'rxjs'
 
 function getSocketDetails(socket) {
   return { socketId: socket.id, address: socket.handshake.address }
@@ -25,9 +19,9 @@ function app(ioServer) {
   let connection = null;
   r.connect({ host: 'localhost', port: 28015 }, function (err, conn) {
     if (err) throw err;
-    
+
     r.db('transparency').tableCreate('events').run(conn, () => {
-      const connections = fromEvent('connection', ioServer);
+      const connections = Rx.Observable.fromEvent(ioServer, 'connection');
 
       connections.subscribe((socket) => {
         r.db('transparency')
@@ -44,15 +38,17 @@ function app(ioServer) {
           })
       })
 
-      const disconnections = flow(
-        flatMap(socket => flow(
-          fromEvent('disconnect'),
-          concat(of(socket)),
-          combineLatest(concat),
-        )(socket))
-      )(connections);
+      const disconnections =
+        connections
+          .flatMap(socket =>
+            Rx.Observable.combineLatest(
+              Rx.Observable
+                .fromEvent(socket, 'disconnect'),
+              Rx.Observable.of(socket),
+            )
+          )
 
-      disconnections.subscribe(([socket, msg]) => {
+      disconnections.subscribe(([msg, socket]) => {
         r.db('transparency')
           .table('events')
           .insert(
