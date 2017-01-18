@@ -37,7 +37,7 @@ function handler() {
     ),
   };
   socket.emit('client details', clientDetails)
-  
+
   const connects = Rx.Observable
     .fromEvent(socket, 'connect')
     .map(() => ({
@@ -57,30 +57,50 @@ function handler() {
 
   const undoPressed = keypresses
     .filter(event => event.metaKey && event.key === 'z')
-    .map(() => 'undo')
+    .map(() => ({type: 'undoEvent'}))
 
-  const input = keypresses
+  const inputChars = keypresses
     .filter(event => !event.altKey && !event.metaKey && !event.ctrlKey)
     .map(get('key'))
     .filter(key => key.length === 1)
+
+  const undoStack = inputChars
+    .auditTime(1000)
     .startWith('')
+    .map(value => ({ type: 'undoValue', value }))
     .merge(undoPressed)
-    .scan(
-      (acc, event) => event !== 'undo' && acc.concat(event) || ''
+    .scan(({ stack, undo }, event) => ({
+        stack: event.type === 'undoValue' && stack.concat(event.value) ||
+          event.type === 'undoEvent' && stack.slice(0, -1),
+        undo: (event.type == 'undoEvent' && stack.slice(-1) || [null]).pop()
+      }),
+      { stack: [], undo: null }
     )
+
+  const undos = undoStack
+    .filter(stackElement => stackElement.undo !== null)
+
+  const input = undos
+    .merge(inputChars)
+    .scan((acc, event) =>
+      event.undo || acc.concat(event) || ''
+    )
+
+  undoStack
+    .subscribe(undo => console.log(undo))
 
   Rx.Observable
     .fromEvent(document, 'click')
-    .subscribe(event => console.log(event.target))
+    // .subscribe(event => console.log(event.target))
 
   const connectionState = Rx.Observable
     .merge(connects, disconnects)
-    .startWith({type: 'socket', status: 'connecting'})
-  
+    .startWith({ type: 'socket', status: 'connecting' })
+
   return Rx.Observable
     .combineLatest(
       connectionState,
-      input,
+      input.startWith(''),
     )
     .subscribe(
       ([connectionState, input]) => updateDOM(renderVDOM(connectionState, input))
