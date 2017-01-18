@@ -53,12 +53,20 @@ function handler() {
     }))
 
   const keypresses = Rx.Observable
-    .fromEvent(document, 'keypress')
+    .fromEvent(document, 'keydown')
+
+  const undoPressed = keypresses
+    .filter(event => event.metaKey && event.key === 'z')
+    .map(() => 'undo')
+
+  const input = keypresses
+    .filter(event => !event.altKey && !event.metaKey && !event.ctrlKey)
     .map(get('key'))
+    .filter(key => key.length === 1)
     .startWith('')
+    .merge(undoPressed)
     .scan(
-      concat,
-      '',
+      (acc, event) => event !== 'undo' && acc.concat(event) || ''
     )
 
   Rx.Observable
@@ -72,14 +80,14 @@ function handler() {
   return Rx.Observable
     .combineLatest(
       connectionState,
-      keypresses,
+      input,
     )
     .subscribe(
-      ([connectionState, keypresses]) => updateDOM(renderVDOM(connectionState, keypresses))
+      ([connectionState, input]) => updateDOM(renderVDOM(connectionState, input))
     )
 }
 
-function renderVDOM(connectionState, keypresses) {
+function renderVDOM(connectionState, input) {
   return h('div',
     [
       h('ul', { className: 'nav nav-tabs' }, [
@@ -87,7 +95,7 @@ function renderVDOM(connectionState, keypresses) {
           h('li', { className: 'active' }, h('a', { href: "javascript:;" }, 'Client')),
         ]
       ),
-      h('div', keypresses),
+      h('div', input),
       h('i', { className: `fa fa-circle connection-state ${connectionState.status}` }),
     ]
   )
