@@ -32,6 +32,10 @@ function renderVDOM(connectionState) {
   return h('div',
     [
       h('i', { className: `fa fa-circle connection-state ${connectionState}` }),
+      h('div', { className: 'form-group' }, [
+        h('label', { for: 'test-input' }, 'Test input'),
+        h('input', { type: 'text', className: 'form-control', id: 'test-input' }),
+      ]),
     ]
   )
 }
