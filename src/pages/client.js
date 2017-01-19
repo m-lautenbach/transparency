@@ -1,8 +1,13 @@
 import {
+  concat,
   find,
-  flow,
-} from 'lodash'
-import { concat, get } from 'lodash/fp'
+  get,
+  identity,
+  takeRightWhile,
+  last,
+  isEmpty,
+  join,
+} from 'lodash/fp'
 import io from 'socket.io-client'
 import { h } from 'virtual-dom'
 import bowser from 'bowser'
@@ -16,9 +21,11 @@ function handler() {
     browser: {
       name: bowser.name,
       version: bowser.version,
-      capabilities: find(['a', 'c', 'x'], (flag) => bowser[flag]),
+      capabilities: find((flag) => bowser[flag], ['a', 'c', 'x']),
     },
-    os: find([
+    os: find(
+      (flag) => bowser[flag],
+      [
         'mac',
         'windows',
         'windowsphone',
@@ -33,7 +40,6 @@ function handler() {
         'tizen',
         'sailfish'
       ],
-      (flag) => bowser[flag]
     ),
   };
   socket.emit('client details', clientDetails)
@@ -64,30 +70,29 @@ function handler() {
     .map(get('key'))
     .filter(key => key.length === 1)
 
-  const undoStack = inputChars
-    .auditTime(1000)
-    .startWith('')
-    .map(value => ({ type: 'undoValue', value }))
+  const input = inputChars
     .merge(undoPressed)
-    .scan(({ stack, undo }, event) => ({
-        stack: event.type === 'undoValue' && stack.concat(event.value) ||
-          event.type === 'undoEvent' && stack.slice(0, -1),
-        undo: (event.type == 'undoEvent' && stack.slice(-1) || [null]).pop()
-      }),
-      { stack: [], undo: null }
+    .merge(
+      inputChars
+        .auditTime(1000)
+        .map(() => ({type: 'undoMarker'}))
     )
-
-  const undos = undoStack
-    .filter(stackElement => stackElement.undo !== null)
-
-  const input = undos
-    .merge(inputChars)
-    .scan((acc, event) =>
-      event.undo || acc.concat(event) || ''
+    .scan(
+      (acc, event) => {
+        if(event.type === 'undoMarker') {
+          return isEmpty(last(acc)) && acc || acc.concat([[]])
+        }
+        if(event.type === 'undoEvent') {
+          return acc.slice(0, isEmpty(last(acc)) && -2 || -1).concat([[]])
+        }
+        return acc.slice(0, -1).concat(
+          acc.slice(-1).pop().concat(event)
+        )
+      },
+      [[]],
     )
-
-  undoStack
-    .subscribe(undo => console.log(undo))
+    .map(join(''))
+    .distinctUntilChanged()
 
   Rx.Observable
     .fromEvent(document, 'click')
