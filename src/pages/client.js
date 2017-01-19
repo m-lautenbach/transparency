@@ -58,12 +58,22 @@ function handler() {
       status: 'disconnected',
     }))
 
+  const popUndoGroup = acc =>
+    acc.slice(0, isEmpty(last(acc)) && -2 || -1).concat([[]])
+
+  const pushEmptyUndoGroup = acc =>
+    isEmpty(last(acc)) && acc || acc.concat([[]])
+
+  const appendCharToLastUndoGroup = char => (acc) =>
+    acc.slice(0, -1).concat(
+      acc.slice(-1).pop().concat(char)
+    )
+
   const keypresses = Rx.Observable
     .fromEvent(document, 'keydown')
 
   const undoPressed = keypresses
     .filter(event => event.metaKey && event.key === 'z')
-    .map(() => (acc) => acc.slice(0, isEmpty(last(acc)) && -2 || -1).concat([[]]))
 
   const inputChars = keypresses
     .filter(event => !event.altKey && !event.metaKey && !event.ctrlKey)
@@ -71,16 +81,14 @@ function handler() {
     .filter(key => key.length === 1)
 
   const input = inputChars
-    .map((char) => (acc) =>
-      acc.slice(0, -1).concat(
-        acc.slice(-1).pop().concat(char)
-      )
+    .map(appendCharToLastUndoGroup)
+    .merge(
+      undoPressed.map(() => popUndoGroup)
     )
-    .merge(undoPressed)
     .merge(
       inputChars
         .auditTime(1000)
-        .map(() => (acc) => isEmpty(last(acc)) && acc || acc.concat([[]]))
+        .map(() => pushEmptyUndoGroup)
     )
     .scan(
       (acc, f) => f(acc),
