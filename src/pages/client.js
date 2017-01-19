@@ -63,7 +63,7 @@ function handler() {
 
   const undoPressed = keypresses
     .filter(event => event.metaKey && event.key === 'z')
-    .map(() => ({type: 'undoEvent'}))
+    .map(() => (acc) => acc.slice(0, isEmpty(last(acc)) && -2 || -1).concat([[]]))
 
   const inputChars = keypresses
     .filter(event => !event.altKey && !event.metaKey && !event.ctrlKey)
@@ -71,24 +71,19 @@ function handler() {
     .filter(key => key.length === 1)
 
   const input = inputChars
+    .map((char) => (acc) =>
+      acc.slice(0, -1).concat(
+        acc.slice(-1).pop().concat(char)
+      )
+    )
     .merge(undoPressed)
     .merge(
       inputChars
         .auditTime(1000)
-        .map(() => ({type: 'undoMarker'}))
+        .map(() => (acc) => isEmpty(last(acc)) && acc || acc.concat([[]]))
     )
     .scan(
-      (acc, event) => {
-        if(event.type === 'undoMarker') {
-          return isEmpty(last(acc)) && acc || acc.concat([[]])
-        }
-        if(event.type === 'undoEvent') {
-          return acc.slice(0, isEmpty(last(acc)) && -2 || -1).concat([[]])
-        }
-        return acc.slice(0, -1).concat(
-          acc.slice(-1).pop().concat(event)
-        )
-      },
+      (acc, f) => f(acc),
       [[]],
     )
     .map(join(''))
@@ -96,7 +91,6 @@ function handler() {
 
   Rx.Observable
     .fromEvent(document, 'click')
-    // .subscribe(event => console.log(event.target))
 
   const connectionState = Rx.Observable
     .merge(connects, disconnects)
