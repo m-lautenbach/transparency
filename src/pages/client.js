@@ -1,5 +1,8 @@
 import io from 'socket.io-client'
 import { h } from 'virtual-dom'
+import {
+  get,
+} from 'lodash/fp'
 
 import { updateDOM } from '../sinks'
 import Rx from 'rxjs'
@@ -18,6 +21,26 @@ function handler() {
   const connectionState = Rx.Observable
     .merge(connects, disconnects)
     .startWith('connecting')
+
+  Rx.Observable
+    .fromEvent(document, 'input')
+    .map(get('target.id'))
+    .subscribe(id => console.log('input', id))
+
+  const focusOut = Rx.Observable
+    .fromEvent(document, 'focusout')
+
+  const focusIn = Rx.Observable
+    .fromEvent(document, 'focusin')
+
+  Rx.Observable.merge(
+    focusOut.map(() => null),
+    focusIn.map(get('target.id')),
+  )
+    .startWith(null)
+    .subscribe(focus =>
+      console.log(focus)
+    )
 
   return Rx.Observable
     .combineLatest(
