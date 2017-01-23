@@ -2,6 +2,7 @@ import io from 'socket.io-client'
 import { h } from 'virtual-dom'
 import {
   isEqual,
+  last,
   flatten,
   flow,
   get,
@@ -51,26 +52,41 @@ function handler() {
   const updateLastUndoGroup = chars => (acc) =>
     acc.slice(0, -1).concat([chars])
 
+  const hasLastGroupChanged = acc =>
+    acc.length === 1 ||
+      last(acc) !== acc.slice(-2, -1)
+
+  const pushUndoGroup = acc =>
+    hasLastGroupChanged(acc) && acc.concat([last(acc)]) || acc
+
   const inputs = Rx.Observable.combineLatest(
     [Rx.Observable.of(inputData)].concat(
       inputData
         .map(get('id'))
-        .map(id =>
-          Rx.Observable
-            .fromEvent(document, 'input')
-            .filter(targetIdEqual(id))
+        .map(id => {
+          const inputEvents =
+            Rx.Observable
+              .fromEvent(document, 'input')
+              .filter(targetIdEqual(id))
+
+          return inputEvents
             .map(get('target.value'))
             .map(updateLastUndoGroup)
+            .merge(
+              inputEvents
+                .auditTime(1000)
+                .map(() => pushUndoGroup)
+            )
             .scan((acc, f) => f(acc), [])
             .startWith([])
-        )
+        })
     )
   ).map(([inputs, value_a, value_b, value_c]) =>
     zip(
       inputs,
       [value_a, value_b, value_c],
-    ).map(([input, value]) => {
-      return {...input, value: value.join('')}
+    ).map(([input, undoGroups]) => {
+      return {...input, value: last(undoGroups)}
     })
   )
 
