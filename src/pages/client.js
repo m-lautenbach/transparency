@@ -39,22 +39,17 @@ function handler() {
   )
 
   const inputs = Rx.Observable.combineLatest(
-    Rx.Observable.of(inputData),
-    Rx.Observable
-      .fromEvent(document, 'input')
-      .filter(targetIdEqual('input_a'))
-      .map(get('target.value'))
-      .startWith(''),
-    Rx.Observable
-      .fromEvent(document, 'input')
-      .filter(targetIdEqual('input_b'))
-      .map(get('target.value'))
-      .startWith(''),
-    Rx.Observable
-      .fromEvent(document, 'input')
-      .filter(targetIdEqual('input_c'))
-      .map(get('target.value'))
-      .startWith(''),
+    [Rx.Observable.of(inputData)].concat(
+      inputData
+        .map(get('id'))
+        .map(id =>
+          Rx.Observable
+            .fromEvent(document, 'input')
+            .filter(targetIdEqual(id))
+            .map(get('target.value'))
+            .startWith(''),
+        )
+    )
   ).map(([inputs, value_a, value_b, value_c]) =>
     zip(
       inputs,
