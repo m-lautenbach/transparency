@@ -48,6 +48,9 @@ function handler() {
   )
     .startWith(null)
 
+  const updateLastUndoGroup = chars => (acc) =>
+    acc.slice(0, -1).concat([chars])
+
   const inputs = Rx.Observable.combineLatest(
     [Rx.Observable.of(inputData)].concat(
       inputData
@@ -57,7 +60,9 @@ function handler() {
             .fromEvent(document, 'input')
             .filter(targetIdEqual(id))
             .map(get('target.value'))
-            .startWith(''),
+            .map(updateLastUndoGroup)
+            .scan((acc, f) => f(acc), [])
+            .startWith([])
         )
     )
   ).map(([inputs, value_a, value_b, value_c]) =>
@@ -65,7 +70,7 @@ function handler() {
       inputs,
       [value_a, value_b, value_c],
     ).map(([input, value]) => {
-      return {...input, value}
+      return {...input, value: value.join('')}
     })
   )
 
