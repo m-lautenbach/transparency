@@ -49,6 +49,10 @@ function handler() {
   )
     .startWith(null)
 
+  const undoPressed = Rx.Observable
+    .fromEvent(document, 'keydown')
+    .filter(event => event.metaKey && event.key === 'z')
+
   const updateLastUndoGroup = chars => (acc) =>
     acc.slice(0, -1).concat([chars])
 
