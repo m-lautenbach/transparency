@@ -85,10 +85,10 @@ function handler() {
             .startWith([])
         })
     )
-  ).map(([inputs, value_a, value_b, value_c]) =>
+  ).map(([inputs, ...undoStacks]) =>
     zip(
       inputs,
-      [value_a, value_b, value_c],
+      undoStacks,
     ).map(([input, undoGroups]) => {
       return {...input, value: last(undoGroups)}
     })
