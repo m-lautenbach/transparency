@@ -2,6 +2,9 @@ import io from 'socket.io-client'
 import { h } from 'virtual-dom'
 import {
   get,
+  flow,
+  map,
+  flatten,
 } from 'lodash/fp'
 
 import { updateDOM } from '../sinks'
@@ -22,10 +25,15 @@ function handler() {
     .merge(connects, disconnects)
     .startWith('connecting')
 
+  const inputs = [
+    { id: 'input_a', title: 'Input A', value: '' },
+    { id: 'input_b', title: 'Input B', value: '' },
+    { id: 'input_c', title: 'Input C', value: '' },
+  ]
+
   Rx.Observable
     .fromEvent(document, 'input')
-    .map(get('target.id'))
-    .subscribe(id => console.log('input', id))
+    .subscribe(({ target: { id, value } }) => console.log(`input[${id}]: ${value}`))
 
   const focusOut = Rx.Observable
     .fromEvent(document, 'focusout')
@@ -45,6 +53,7 @@ function handler() {
   return Rx.Observable
     .combineLatest(
       connectionState,
+      Rx.Observable.of(inputs)
     )
     .subscribe(flow(
       renderVDOM,
@@ -52,14 +61,17 @@ function handler() {
     ))
 }
 
-function renderVDOM([connectionState]) {
+function renderVDOM([connectionState, inputs]) {
   return h('div',
     [
       h('i', { className: `fa fa-circle connection-state ${connectionState}` }),
-      h('div', { className: 'form-group' }, [
-        h('label', { for: 'test-input' }, 'Test input'),
-        h('input', { type: 'text', className: 'form-control', id: 'test-input' }),
-      ]),
+      h('div', { className: 'form-group' }, flow(
+        map(({ id, title, value }) => [
+          h('label', { for: id }, title),
+          h('input', { type: 'text', className: 'form-control', id, value }),
+        ]),
+        flatten,
+      )(inputs))
     ]
   )
 }
