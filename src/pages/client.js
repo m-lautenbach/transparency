@@ -38,6 +38,16 @@ function handler() {
     isEqual(id),
   )
 
+  const currentFocus = Rx.Observable.merge(
+    Rx.Observable
+      .fromEvent(document, 'focusout')
+      .map(() => null),
+    Rx.Observable
+      .fromEvent(document, 'focusin')
+      .map(get('target.id')),
+  )
+    .startWith(null)
+
   const inputs = Rx.Observable.combineLatest(
     [Rx.Observable.of(inputData)].concat(
       inputData
@@ -58,21 +68,6 @@ function handler() {
       return {...input, value}
     })
   )
-
-  const focusOut = Rx.Observable
-    .fromEvent(document, 'focusout')
-
-  const focusIn = Rx.Observable
-    .fromEvent(document, 'focusin')
-
-  Rx.Observable.merge(
-    focusOut.map(() => null),
-    focusIn.map(get('target.id')),
-  )
-    .startWith(null)
-    .subscribe(focus =>
-      console.log(focus)
-    )
 
   return Rx.Observable
     .combineLatest(
