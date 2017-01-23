@@ -1,10 +1,12 @@
 import io from 'socket.io-client'
 import { h } from 'virtual-dom'
 import {
-  get,
-  flow,
-  map,
+  isEqual,
   flatten,
+  flow,
+  get,
+  map,
+  zip,
 } from 'lodash/fp'
 
 import { updateDOM } from '../sinks'
@@ -25,15 +27,42 @@ function handler() {
     .merge(connects, disconnects)
     .startWith('connecting')
 
-  const inputs = [
-    { id: 'input_a', title: 'Input A', value: '' },
-    { id: 'input_b', title: 'Input B', value: '' },
-    { id: 'input_c', title: 'Input C', value: '' },
+  const inputData = [
+    { id: 'input_a', title: 'Input A' },
+    { id: 'input_b', title: 'Input B' },
+    { id: 'input_c', title: 'Input C' },
   ]
 
-  Rx.Observable
-    .fromEvent(document, 'input')
-    .subscribe(({ target: { id, value } }) => console.log(`input[${id}]: ${value}`))
+  const targetIdEqual = id => flow(
+    get('target.id'),
+    isEqual(id),
+  )
+
+  const inputs = Rx.Observable.combineLatest(
+    Rx.Observable.of(inputData),
+    Rx.Observable
+      .fromEvent(document, 'input')
+      .filter(targetIdEqual('input_a'))
+      .map(get('target.value'))
+      .startWith(''),
+    Rx.Observable
+      .fromEvent(document, 'input')
+      .filter(targetIdEqual('input_b'))
+      .map(get('target.value'))
+      .startWith(''),
+    Rx.Observable
+      .fromEvent(document, 'input')
+      .filter(targetIdEqual('input_c'))
+      .map(get('target.value'))
+      .startWith(''),
+  ).map(([inputs, value_a, value_b, value_c]) =>
+    zip(
+      inputs,
+      [value_a, value_b, value_c],
+    ).map(([input, value]) => {
+      return {...input, value}
+    })
+  )
 
   const focusOut = Rx.Observable
     .fromEvent(document, 'focusout')
@@ -53,7 +82,7 @@ function handler() {
   return Rx.Observable
     .combineLatest(
       connectionState,
-      Rx.Observable.of(inputs)
+      inputs,
     )
     .subscribe(flow(
       renderVDOM,
