@@ -31,7 +31,7 @@ function handler() {
     .combineLatest(
       connectionState,
       (connectionState) => {
-        return {connectionState}
+        return { connectionState }
       }
     )
     .subscribe(flow(
@@ -40,7 +40,7 @@ function handler() {
     ))
 }
 
-function renderVDOM({connectionState}) {
+function renderVDOM({ connectionState }) {
   return h('div',
     [
       h('i', { className: `fa fa-circle connection-state ${connectionState}` }),
